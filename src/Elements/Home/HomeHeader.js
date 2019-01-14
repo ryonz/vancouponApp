@@ -1,5 +1,10 @@
 import React from 'react';
-import { StyleSheet, Text, View, Image } from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+} from 'react-native';
 
 class HomeHeader extends React.Component {
   render() {
@@ -23,20 +28,20 @@ class HomeHeader extends React.Component {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flex: 0.5,
     width: '100%',
     backgroundColor: 'red',
   },
   homeHeaderImage: {
-    height: '50%',
+    height: '100%',
     width: '100%',
   },
   homeHeaderTitleBox: {
     position: 'absolute',
-    width: 320,
+    width: '85.33%',
     height: 87,
-    top: 175,
-    paddingLeft: 16,
+    top: '43.6%',
+    paddingLeft: '4.26%',
   },
   homeHeaderTitle: {
     fontSize: 25,
