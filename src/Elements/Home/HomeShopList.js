@@ -3,7 +3,7 @@ import {
   StyleSheet,
   View,
   Text,
-  TouchableHighlight,
+  TouchableOpacity,
   ScrollView,
   Image,
 } from 'react-native';
@@ -20,29 +20,33 @@ const shopLists = [
   { genre: 'お店', image: listImageSorce.shop },
   { genre: '美容', image: listImageSorce.beauty },
   { genre: '観光', image: listImageSorce.sightseeing },
-  // { genre: 'エンタメ', image: '' },
-  // { genre: '病院', image: '' },
-  // { genre: 'その他', image: '' },
+  { genre: 'エンタメ', image: listImageSorce.beauty },
+  { genre: '病院', image: listImageSorce.beauty },
+  { genre: 'その他', image: listImageSorce.beauty },
 ];
 
 class HomeShopList extends React.Component {
   renderShopList() {
     return shopLists.map((value, index) => {
       return (
-        <View
+        <TouchableOpacity
           key={index}
-          style={styles.shopListBox}
+          // onPress={onPress}
         >
-          <Image
-            source={value.image}
-            style={styles.shopListImage}
-          />
-          <View style={styles.shopListTextBox}>
-            <Text style={styles.shopListText}>
-              {value.genre}
-            </Text>
+          <View
+            style={styles.shopListBox}
+          >
+            <Image
+              source={value.image}
+              style={styles.shopListImage}
+            />
+            <View style={styles.shopListTextBox}>
+              <Text style={styles.shopListText}>
+                {value.genre}
+              </Text>
+            </View>
           </View>
-        </View>
+        </TouchableOpacity>
       );
     });
   }
@@ -63,25 +67,29 @@ class HomeShopList extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 0.2,
-    backgroundColor: 'gray',
   },
   shopListBox: {
     width: 140,
     height: 105,
-    backgroundColor: 'red',
-    marginTop: '9%',
+    marginTop: 40,
+    marginLeft: 16,
+    shadowOffset: {
+      width: 1,
+      height: 2,
+    },
+    shadowOpacity: 0.8,
   },
   shopListImage: {
     width: 140,
     height: 105,
-    marginLeft: '12%',
+    borderRadius: 4,
   },
   shopListTextBox: {
     position: 'absolute',
-    top: '26%',
-    left: '12%',
+    top: '36%',
+    left: '0%',
     width: 140,
-    paddingTop: '2%',
+    paddingTop: '3%',
     paddingBottom: '2%',
     backgroundColor: 'rgba(111,111,111,0.8)',
 
@@ -90,7 +98,7 @@ const styles = StyleSheet.create({
     fontSize: 25,
     fontWeight: '900',
     color: '#fff',
-    paddingLeft: '28%',
+    paddingLeft: '33%',
   },
 });
 
