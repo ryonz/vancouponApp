@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
   buttonBox: {
     width: '98%',
     height: 42,
-    borderRadius: 8,
+    borderRadius: 6,
     alignItems: 'center',
     borderColor: '#707070',
     borderWidth: 0.5,

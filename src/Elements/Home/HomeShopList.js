@@ -33,9 +33,7 @@ class HomeShopList extends React.Component {
           key={index}
           // onPress={onPress}
         >
-          <View
-            style={styles.shopListBox}
-          >
+          <View style={styles.shopListBox}>
             <Image
               source={value.image}
               style={styles.shopListImage}
@@ -54,6 +52,9 @@ class HomeShopList extends React.Component {
   render() {
     return (
       <View style={styles.container}>
+        <View style={styles.shopListQuestionTextBox}>
+          <Text style={styles.shopListQuestionText}>どんなクーポンをお探しですか？</Text>
+        </View>
         <ScrollView
           horizontal
         >
@@ -66,12 +67,12 @@ class HomeShopList extends React.Component {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 0.2,
+    flex: 0.3,
   },
   shopListBox: {
     width: 140,
     height: 105,
-    marginTop: 40,
+    marginTop: 30,
     marginLeft: 16,
     shadowOffset: {
       width: 1,
@@ -81,12 +82,12 @@ const styles = StyleSheet.create({
   },
   shopListImage: {
     width: 140,
-    height: 105,
+    height: 120,
     borderRadius: 4,
   },
   shopListTextBox: {
     position: 'absolute',
-    top: '36%',
+    top: '44%',
     left: '0%',
     width: 140,
     paddingTop: '3%',
@@ -99,6 +100,15 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     color: '#fff',
     paddingLeft: '33%',
+  },
+  shopListQuestionTextBox: {
+    width: '100%',
+    marginLeft: 16,
+    paddingTop: '5%',
+  },
+  shopListQuestionText: {
+    fontSize: 20,
+    fontWeight: '900',
   },
 });
 
