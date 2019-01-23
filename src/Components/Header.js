@@ -3,14 +3,17 @@ import {
   View,
   StyleSheet,
   Text,
+  Dimensions,
 } from 'react-native';
 
 class Header extends React.Component {
   render() {
+    const { children } = this.props;
+
     return (
       <View style={styles.container}>
         <Text style={styles.headerText}>
-          {this.props.children}
+          {children}
         </Text>
       </View>
     );
@@ -19,11 +22,12 @@ class Header extends React.Component {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 0.13,
+    // flex: 0.13,
+    width: '100%',
+    height: Dimensions.get('window').height * 0.12,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(219,0,76,0.70)',
-    width: '100%',
     marginBottom: 20,
     shadowOffset: {
       width: 0,

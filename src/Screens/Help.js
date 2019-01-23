@@ -5,10 +5,12 @@ import {
   Text,
   TouchableOpacity,
 } from 'react-native';
-// import { Font } from 'expo';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { expo } from '../../app.json';
 import Header from '../Components/Header';
+import HelpModalAboutThisApp from '../Elements/Help/HelpModalAboutThisApp';
+import HelpModalAboutJpcanada from '../Elements/Help/HelpModalAboutJpcanada';
+import HelpModalAboutRegulation from '../Elements/Help/HelpModalAboutRegulation';
 
 const HelpLists = [
   { name: 'アプリについて', navigationLink: '' },
@@ -18,30 +20,77 @@ const HelpLists = [
 ];
 
 class Help extends React.Component {
+  state = {
+    modalVisible0: false,
+    modalVisible1: false,
+    modalVisible2: false,
+  }
+
   renderHelpLists() {
     return HelpLists.map((value, index) => {
+      if (index !== 3) {
+        return (
+          <TouchableOpacity
+            key={index}
+            style={styles.helpListsBox}
+            onPress={() => {
+              if (index === 0) {
+                this.setState({ modalVisible0: true });
+              } else if (index === 1) {
+                this.setState({ modalVisible1: true });
+              } else if (index === 2) {
+                this.setState({ modalVisible2: true });
+              }
+            }}
+          >
+            <Text style={styles.helpListText}>
+              {value.name}
+            </Text>
+            <Icon name="chevron-right" style={styles.helpRightIcon} />
+          </TouchableOpacity>
+        );
+      } //以下アプリのバージョン
       return (
-        <TouchableOpacity
+        <View
           key={index}
           style={styles.helpListsBox}
         >
           <Text style={styles.helpListText}>
             {value.name}
           </Text>
-          {
-            index !== 3 ? <Icon name="chevron-right" style={styles.helpRightIcon} />
-              : <Text style={styles.appVersion}>{expo.version}</Text>
-          }
-        </TouchableOpacity>
+          <Text style={styles.appVersion}>{expo.version}</Text>
+        </View>
       );
     });
   }
 
   render() {
+    const { modalVisible0, modalVisible1, modalVisible2 } = this.state;
     return (
       <View style={styles.container}>
         <Header>ヘルプ</Header>
         {this.renderHelpLists()}
+        <HelpModalAboutThisApp
+          isVisible={modalVisible0}
+          onBackdropPress={() => { this.setState({ modalVisible0: false }); }}
+        >
+          {HelpLists[0].name}
+        </HelpModalAboutThisApp>
+
+        <HelpModalAboutJpcanada
+          isVisible={modalVisible1}
+          onBackdropPress={() => { this.setState({ modalVisible1: false }); }}
+        >
+          {HelpLists[1].name}
+        </HelpModalAboutJpcanada>
+
+        <HelpModalAboutRegulation
+          isVisible={modalVisible2}
+          onBackdropPress={() => { this.setState({ modalVisible2: false }); }}
+        >
+          {HelpLists[2].name}
+        </HelpModalAboutRegulation>
+
       </View>
     );
   }

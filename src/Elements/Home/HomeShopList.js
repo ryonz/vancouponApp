@@ -8,7 +8,7 @@ import {
   Image,
 } from 'react-native';
 
-const listImageSorce = {
+const listImageSource = {
   food: require('../../../assets/Images/Home/HomeListImageFood.jpg'),
   shop: require('../../../assets/Images/Home/HomeListImageShop.jpg'),
   beauty: require('../../../assets/Images/Home/HomeListImageBeauty.jpg'),
@@ -16,13 +16,13 @@ const listImageSorce = {
 };
 
 const shopLists = [
-  { genre: '飲食', image: listImageSorce.food },
-  { genre: 'お店', image: listImageSorce.shop },
-  { genre: '美容', image: listImageSorce.beauty },
-  { genre: '観光', image: listImageSorce.sightseeing },
-  { genre: 'エンタメ', image: listImageSorce.beauty },
-  { genre: '病院', image: listImageSorce.beauty },
-  { genre: 'その他', image: listImageSorce.beauty },
+  { genre: '飲食', image: listImageSource.food },
+  { genre: 'お店', image: listImageSource.shop },
+  { genre: '美容', image: listImageSource.beauty },
+  { genre: '観光', image: listImageSource.sightseeing },
+  { genre: 'エンタメ', image: listImageSource.beauty },
+  { genre: '病院', image: listImageSource.beauty },
+  { genre: 'その他', image: listImageSource.beauty },
 ];
 
 class HomeShopList extends React.Component {
@@ -31,7 +31,6 @@ class HomeShopList extends React.Component {
       return (
         <TouchableOpacity
           key={index}
-          // onPress={onPress}
         >
           <View style={styles.shopListBox}>
             <Image
@@ -39,7 +38,12 @@ class HomeShopList extends React.Component {
               style={styles.shopListImage}
             />
             <View style={styles.shopListTextBox}>
-              <Text style={styles.shopListText}>
+              <Text
+                style={
+                value.genre.length === 2 ? styles.shopListText
+                  : value.genre.length === 3 ? styles.shopListTextLength3
+                    : styles.shopListTextLength4}
+              >
                 {value.genre}
               </Text>
             </View>
@@ -76,7 +80,7 @@ const styles = StyleSheet.create({
     marginLeft: 16,
     shadowOffset: {
       width: 1,
-      height: 2,
+      height: 1,
     },
     shadowOpacity: 0.8,
   },
@@ -100,6 +104,18 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     color: '#fff',
     paddingLeft: '33%',
+  },
+  shopListTextLength3: {
+    fontSize: 25,
+    fontWeight: '900',
+    color: '#fff',
+    paddingLeft: '25%',
+  },
+  shopListTextLength4: {
+    fontSize: 25,
+    fontWeight: '900',
+    color: '#fff',
+    paddingLeft: '18%',
   },
   shopListQuestionTextBox: {
     width: '100%',
