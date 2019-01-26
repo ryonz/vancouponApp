@@ -15,9 +15,41 @@ const items = [
   { num: 2, name: 'コンビニ屋', tag: 'ショッピング', shortDescription: '＄10以上のお買い上げでスタンプ１個', image: '' },
   { num: 3, name: 'コンビニ屋', tag: 'ショッピング', shortDescription: '＄10以上のお買い上げでスタンプ１個', image: '' },
   { num: 4, name: 'コンビニ屋', tag: 'ショッピング', shortDescription: '＄10以上のお買い上げでスタンプ１個', image: '' },
+  { num: 5, name: 'コンビニ屋', tag: 'ショッピング', shortDescription: '＄10以上のお買い上げでスタンプ１個', image: '' },
+
 ];
 
 class GeneralScreenItems extends React.Component {
+  state = {
+    like: false,
+  }
+
+  handleLikeButton() {
+    const { like } = this.state;
+    if (like === false) {
+      this.setState({ like: true });
+    } else {
+      this.setState({ like: false });
+    }
+  }
+
+  handleLikeImage() {
+    const { like } = this.state;
+    if (like === true) {
+      return (
+        <Image
+          source={require('../../assets/Images/Icons/likeRed.png')}
+          style={styles.likeButton}
+        />
+      );
+    }
+    return (
+      <Image
+        source={require('../../assets/Images/Icons/like.png')}
+        style={styles.likeButton}
+      />
+    );
+  }
 
   renderItemBox() {
     return items.map((value, index) => {
@@ -30,7 +62,7 @@ class GeneralScreenItems extends React.Component {
                 style={styles.itemsImage}
               />
             </View>
-            <View style={styles.itemsNameAndTagBox}>
+            <View style={{ flexDirection: 'row' }}>
               <Text style={styles.itemsName}>
                 コンビニ屋
               </Text>
@@ -39,9 +71,17 @@ class GeneralScreenItems extends React.Component {
               </Text>
             </View>
 
-            <Text style={styles.itemsDescription}>
-               ＄10以上のお買い上げでスタンプ１個
-            </Text>
+            <View style={{ flexDirection: 'row' }}>
+              <Text style={styles.itemsDescription}>
+                ＄10以上のお買い上げでスタンプ１個
+              </Text>
+              <TouchableOpacity
+                style={styles.likeButtonBox}
+                onPress={this.handleLikeButton.bind(this)}
+              >
+                {this.handleLikeImage()}
+              </TouchableOpacity>
+            </View>
           </View>
         </TouchableOpacity>
       );
@@ -64,12 +104,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     width: '100%',
+    paddingTop: 20,
   },
   itemsBox: {
     width: (Dimensions.get('window').width - 20) / 2,
     height: 223,
-    borderWidth: 0.5,
-    borderColor: '#707070',
+    borderWidth: 0.2,
+    backgroundColor: '#fff',
     borderRadius: 4,
     margin: 5,
     overflow: 'hidden',
@@ -82,15 +123,12 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
-  itemsNameAndTagBox: {
-    flexDirection: 'row',
-  },
   itemsName: {
     fontSize: 16,
     color: '#707070',
     fontWeight: 'bold',
     marginRight: 10,
-    paddingLeft: 5,
+    paddingLeft: 1,
   },
   itemsTag: {
     fontSize: 9,
@@ -102,9 +140,19 @@ const styles = StyleSheet.create({
     paddingRight: 4,
   },
   itemsDescription: {
+    width: '60%',
     fontSize: 9,
     color: '#707070',
-    padding: 5,
+    paddingTop: 5,
+    paddingLeft: 10,
+  },
+  likeButtonBox: {
+    paddingTop: 10,
+    paddingLeft: '14%',
+  },
+  likeButton: {
+    width: 18,
+    height: 18,
   },
 });
 

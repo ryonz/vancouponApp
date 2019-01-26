@@ -108,6 +108,7 @@ const styles = StyleSheet.create({
     width: '100%',
     borderBottomWidth: 0.5,
     borderBottomColor: '#707070',
+    marginTop: 20,
   },
   helpListText: {
     fontSize: 15,
