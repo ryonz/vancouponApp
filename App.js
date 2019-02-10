@@ -1,11 +1,18 @@
 import React from 'react';
-import { createBottomTabNavigator, createAppContainer } from 'react-navigation';
+import {
+  createBottomTabNavigator,
+  createAppContainer,
+  createStackNavigator
+} from 'react-navigation';
 import firebase from 'firebase';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import ENV from './env.json';
 import Home from './src/Screens/Home';
+import Restaurant from './src/Screens/Restaurant';
 import FavoriteShops from './src/Screens/FavoriteShops';
 import Help from './src/Screens/Help';
+
+import ShopModal from './src/Components/ShopModal';
 
 const config = {
   apiKey: ENV.FIREBASE_API_KEY,
@@ -17,23 +24,36 @@ const config = {
 };
 firebase.initializeApp(config);
 
-const App = createBottomTabNavigator(
+//Home画面遷移用
+const HomeTabNavigator = createStackNavigator(
   {
+    ShopModal: { screen: ShopModal },
+    Home: { screen: Home },
+    Restaurant: { screen: Restaurant },
+  },
+  {
+    headerMode: 'none',
+  },
+);
+
+//フッタータブ画面遷移用
+const App = createBottomTabNavigator( 
+  {
+    Home: {
+      screen: HomeTabNavigator,
+      navigationOptions: {
+        tabBarLabel: 'ホーム',
+        tabBarIcon: ({ tintColor }) => (
+          <Icon name="home" size={30} color={tintColor} />
+        ),
+      },
+    },
     Favorite: {
       screen: FavoriteShops,
       navigationOptions: {
         tabBarLabel: 'お気に入り',
         tabBarIcon: ({ tintColor }) => (
           <Icon name="heart" size={25} color={tintColor} />
-        ),
-      },
-    },
-    Home: {
-      screen: Home,
-      navigationOptions: {
-        tabBarLabel: 'ホーム',
-        tabBarIcon: ({ tintColor }) => (
-          <Icon name="home" size={30} color={tintColor} />
         ),
       },
     },
@@ -57,6 +77,9 @@ const App = createBottomTabNavigator(
       style: {
         width: '100%',
         height: 70,
+      },
+      tabStyle: {
+        paddingTop: 20,
       },
     },
   },

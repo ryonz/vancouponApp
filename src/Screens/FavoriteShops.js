@@ -4,12 +4,21 @@ import {
   View,
   Text
 } from 'react-native';
+import firebase from 'firebase';
 import GeneralScreenComponent from '../Components/GeneralScreenComponent';
+
+const favoriteItems = [];
 
 class FavoriteShops extends React.Component {
   state = {
     headerTitle: 'お気に入り',
   }
+
+  // //databaseの情報を取得
+  // componentWillMount() {
+  //   const proFavoriteItems = [];
+  //   const databaseRef = firebase.database().ref('konbiniya');
+  // }
 
   render() {
     const { headerTitle } = this.state;
