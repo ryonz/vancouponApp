@@ -7,10 +7,11 @@ import HomeAllShopListButton from '../Elements/Home/HomeAllShopListButton';
 
 class Home extends React.Component {
   render() {
+    const { navigation } = this.props;
     return (
       <View style={styles.container}>
         <HomeHeader />
-        <HomeShopList />
+        <HomeShopList navigation={navigation} />
         <HomeAllCouponListButton />
         <HomeAllShopListButton />
       </View>

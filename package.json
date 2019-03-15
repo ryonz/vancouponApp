@@ -10,23 +10,31 @@
     "@expo/vector-icons": "^9.0.0",
     "expo": "^32.0.0",
     "firebase": "^5.8.1",
+    "mobx": "^5.8.0",
+    "mobx-react": "^5.4.3",
     "react": "16.5.0",
     "react-native": "https://github.com/expo/react-native/archive/sdk-32.0.0.tar.gz",
+    "react-native-maps": "^0.23.0",
     "react-native-modal": "^7.0.2",
     "react-native-vector-icons": "^6.1.0",
     "react-navigation": "^3.0.9"
   },
   "devDependencies": {
+    "@babel/plugin-proposal-class-properties": "^7.3.4",
+    "@babel/plugin-proposal-decorators": "^7.3.0",
+    "@babel/preset-react": "^7.0.0",
     "babel-eslint": "^10.0.1",
+    "babel-plugin-transform-decorators-legacy": "^1.3.5",
     "babel-preset-expo": "^5.0.0",
+    "babel-preset-mobx": "^2.0.0",
+    "babel-preset-react-native": "^4.0.1",
     "directory": "^0.1.0",
     "eslint": "^5.12.0",
     "eslint-config-airbnb": "^17.1.0",
     "eslint-plugin-import": "^2.14.0",
     "eslint-plugin-jsx-a11y": "^6.1.2",
     "eslint-plugin-react": "^7.12.3",
-    "mobx": "^5.8.0",
-    "mobx-react": "^5.4.3"
+    "metro-react-native-babel-preset": "^0.53.0"
   },
   "private": true
 }

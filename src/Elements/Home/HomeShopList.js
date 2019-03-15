@@ -7,6 +7,7 @@ import {
   ScrollView,
   Image,
 } from 'react-native';
+import { observer, inject } from 'mobx-react/native';
 
 const listImageSource = {
   food: require('../../../assets/Images/Home/HomeListImageFood.jpg'),
@@ -28,9 +29,28 @@ const shopLists = [
 class HomeShopList extends React.Component {
   renderShopList() {
     return shopLists.map((value, index) => {
+      const { navigate } = this.props.navigation;
       return (
         <TouchableOpacity
           key={index}
+          onPress={() => {
+            if (value.genre === '飲食') {
+              navigate('EachShopGenreScreen', 'food');
+            } else if (value.genre === 'お店') {
+              navigate('EachShopGenreScreen', 'shop');
+            } else if (value.genre === '美容') {
+              navigate('EachShopGenreScreen', 'beauty');
+            } else if (value.genre === '観光') {
+              navigate('EachShopGenreScreen', 'sightseeing');
+            } else if (value.genre === 'エンタメ') {
+              navigate('EachShopGenreScreen', 'entertainment');
+            } else if (value.genre === '病院') {
+              navigate('EachShopGenreScreen', 'hospital');
+            } else if (value.genre === 'その他') {
+              navigate('EachShopGenreScreen', 'other');
+            }
+          }}
+
         >
           <View style={styles.shopListBox}>
             <Image

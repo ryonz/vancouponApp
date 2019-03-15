@@ -8,18 +8,21 @@ import {
   TouchableOpacity,
   Dimensions,
 } from 'react-native';
+import { inject, observer } from 'mobx-react/native';
 
 const items = [
   { num: 0, name: 'コンビニ屋', tag: 'ショッピング', shortDescription: '＄10以上のお買い上げでスタンプ１個', image: '' },
-  { num: 1, name: 'コンビニ屋', tag: 'ショッピング', shortDescription: '＄10以上のお買い上げでスタンプ１個', image: '' },
-  { num: 2, name: 'コンビニ屋', tag: 'ショッピング', shortDescription: '＄10以上のお買い上げでスタンプ１個', image: '' },
-  { num: 3, name: 'コンビニ屋', tag: 'ショッピング', shortDescription: '＄10以上のお買い上げでスタンプ１個', image: '' },
-  { num: 4, name: 'コンビニ屋', tag: 'ショッピング', shortDescription: '＄10以上のお買い上げでスタンプ１個', image: '' },
-  { num: 5, name: 'コンビニ屋', tag: 'ショッピング', shortDescription: '＄10以上のお買い上げでスタンプ１個', image: '' },
+  // { num: 1, name: 'コンビニ屋', tag: 'ショッピング', shortDescription: '＄10以上のお買い上げでスタンプ１個', image: '' },
+  // { num: 2, name: 'コンビニ屋', tag: 'ショッピング', shortDescription: '＄10以上のお買い上げでスタンプ１個', image: '' },
+  // { num: 3, name: 'コンビニ屋', tag: 'ショッピング', shortDescription: '＄10以上のお買い上げでスタンプ１個', image: '' },
+  // { num: 4, name: 'コンビニ屋', tag: 'ショッピング', shortDescription: '＄10以上のお買い上げでスタンプ１個', image: '' },
+  // { num: 5, name: 'コンビニ屋', tag: 'ショッピング', shortDescription: '＄10以上のお買い上げでスタンプ１個', image: '' },
 
 ];
 
-class GeneralScreenItems extends React.Component {
+@inject('store')
+@observer
+class Items extends React.Component {
   state = {
     like: false,
   }
@@ -64,7 +67,7 @@ class GeneralScreenItems extends React.Component {
             </View>
             <View style={{ flexDirection: 'row' }}>
               <Text style={styles.itemsName}>
-                コンビニ屋
+                {this.props.store.restaurantStore.name}
               </Text>
               <Text style={styles.itemsTag}>
                 ショッピング
@@ -128,6 +131,7 @@ const styles = StyleSheet.create({
     color: '#707070',
     fontWeight: 'bold',
     marginRight: 10,
+    marginLeft: 5,
     paddingLeft: 1,
   },
   itemsTag: {
@@ -156,4 +160,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default GeneralScreenItems;
+export default Items;

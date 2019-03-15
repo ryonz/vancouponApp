@@ -2,13 +2,13 @@ import React from 'react';
 import {
   createBottomTabNavigator,
   createAppContainer,
-  createStackNavigator
+  createStackNavigator,
 } from 'react-navigation';
 import firebase from 'firebase';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import ENV from './env.json';
 import Home from './src/Screens/Home';
-import Restaurant from './src/Screens/Restaurant';
+import EachShopGenreScreen from './src/Screens/EachShopGenreScreen';
 import FavoriteShops from './src/Screens/FavoriteShops';
 import Help from './src/Screens/Help';
 
@@ -27,9 +27,9 @@ firebase.initializeApp(config);
 //Home画面遷移用
 const HomeTabNavigator = createStackNavigator(
   {
-    ShopModal: { screen: ShopModal },
     Home: { screen: Home },
-    Restaurant: { screen: Restaurant },
+    EachShopGenreScreen: { screen: EachShopGenreScreen },
+    ShopModal: { screen: ShopModal },
   },
   {
     headerMode: 'none',
@@ -37,7 +37,7 @@ const HomeTabNavigator = createStackNavigator(
 );
 
 //フッタータブ画面遷移用
-const App = createBottomTabNavigator( 
+const Navigator = createBottomTabNavigator(
   {
     Home: {
       screen: HomeTabNavigator,
@@ -85,4 +85,4 @@ const App = createBottomTabNavigator(
   },
 );
 
-export default createAppContainer(App);
+export default createAppContainer(Navigator);

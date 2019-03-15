@@ -9,7 +9,6 @@ import {
 class Header extends React.Component {
   render() {
     const { children } = this.props;
-
     return (
       <View style={styles.container}>
         <Text style={styles.headerText}>
