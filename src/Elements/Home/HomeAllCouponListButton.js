@@ -7,9 +7,17 @@ import {
 } from 'react-native';
 
 class HomeAllCouponListButton extends React.Component {
+  handleOnPressNavigation() {
+    const { navigation } = this.props;
+    const { params } = navigation.state;
+    navigation.navigate('EachShopGenreScreen', 'allCoupon');
+  }
+
   renderButton() {
     return (
-      <TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => { this.handleOnPressNavigation(); }}
+      >
         <View style={styles.buttonBox}>
           <Text style={styles.buttonTitleText}>
             クーポン一覧

@@ -12,8 +12,8 @@ class Home extends React.Component {
       <View style={styles.container}>
         <HomeHeader />
         <HomeShopList navigation={navigation} />
-        <HomeAllCouponListButton />
-        <HomeAllShopListButton />
+        <HomeAllCouponListButton navigation={navigation} />
+        <HomeAllShopListButton navigation={navigation} />
       </View>
     );
   }

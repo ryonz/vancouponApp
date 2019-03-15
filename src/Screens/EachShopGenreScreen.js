@@ -35,6 +35,8 @@ class EachShopGenreScreen extends React.Component {
       this.setState({ headerTitle: '病院' });
     } else if (params === 'other') {
       this.setState({ headerTitle: 'その他' });
+    } else if (params === 'allCoupon') {
+      this.setState({ headerTitle: 'クーポン一覧' });
     }
   }
 
