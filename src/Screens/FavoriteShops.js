@@ -2,13 +2,13 @@ import React from 'react';
 import {
   StyleSheet,
   View,
-  Text
 } from 'react-native';
-import firebase from 'firebase';
+import { inject, observer } from 'mobx-react/native';
 import Header from '../Components/Header';
 import EachShopScreenMiddleComponent from '../Components/EachShopScreenMiddleComponent';
 
-
+@inject('store')
+@observer
 class FavoriteShops extends React.Component {
   render() {
     return (

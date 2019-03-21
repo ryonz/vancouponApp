@@ -37,6 +37,8 @@ class EachShopGenreScreen extends React.Component {
       this.setState({ headerTitle: 'その他' });
     } else if (params === 'allCoupon') {
       this.setState({ headerTitle: 'クーポン一覧' });
+    } else if (params === 'allShop') {
+      this.setState({ headerTitle: 'お店一覧' });
     }
   }
 

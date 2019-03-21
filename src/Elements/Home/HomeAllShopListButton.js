@@ -7,9 +7,17 @@ import {
 } from 'react-native';
 
 class HomeAllShopListButton extends React.Component {
+  handleOnPressNavigation() {
+    const { navigation } = this.props;
+    const { params } = navigation.state;
+    navigation.navigate('EachShopGenreScreen', 'allShop');
+  }
+
   renderButton() {
     return (
-      <TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => { this.handleOnPressNavigation(); }}
+      >
         <View style={styles.buttonBox}>
           <Text style={styles.buttonTitleText}>
             お店一覧

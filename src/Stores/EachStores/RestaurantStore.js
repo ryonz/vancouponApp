@@ -2,7 +2,7 @@ import { observable } from 'mobx';
 
 class RestaurantStore {
   @observable
-  name = 'コンビニ屋';
+  name = 'コンビニ';
 
   @observable
   tag = 'ショッピング';

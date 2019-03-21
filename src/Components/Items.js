@@ -8,23 +8,34 @@ import {
   TouchableOpacity,
   Dimensions,
 } from 'react-native';
+import firebase from 'firebase';
 import { inject, observer } from 'mobx-react/native';
-
-const items = [
-  { num: 0, name: 'コンビニ屋', tag: 'ショッピング', shortDescription: '＄10以上のお買い上げでスタンプ１個', image: '' },
-  // { num: 1, name: 'コンビニ屋', tag: 'ショッピング', shortDescription: '＄10以上のお買い上げでスタンプ１個', image: '' },
-  // { num: 2, name: 'コンビニ屋', tag: 'ショッピング', shortDescription: '＄10以上のお買い上げでスタンプ１個', image: '' },
-  // { num: 3, name: 'コンビニ屋', tag: 'ショッピング', shortDescription: '＄10以上のお買い上げでスタンプ１個', image: '' },
-  // { num: 4, name: 'コンビニ屋', tag: 'ショッピング', shortDescription: '＄10以上のお買い上げでスタンプ１個', image: '' },
-  // { num: 5, name: 'コンビニ屋', tag: 'ショッピング', shortDescription: '＄10以上のお買い上げでスタンプ１個', image: '' },
-
-];
 
 @inject('store')
 @observer
 class Items extends React.Component {
   state = {
     like: false,
+    items: [],
+  }
+
+  componentDidMount() {
+    const db = firebase.firestore();
+    db.collection('foods')
+      .get()
+      .then((snapshot) => {
+        const items = [];
+        snapshot.forEach((doc) => {
+          const docId = doc.id;
+          const docData = doc.data();
+          items.push(docData);
+          console.log(docData);
+        });
+        this.setState({ items });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   }
 
   handleLikeButton() {
@@ -55,7 +66,10 @@ class Items extends React.Component {
   }
 
   renderItemBox() {
+    const items = this.state.items;
     return items.map((value, index) => {
+      const { store } = this.props;
+      const { restaurantStore } = store;
       return (
         <TouchableOpacity key={index}>
           <View style={styles.itemsBox}>
@@ -67,16 +81,16 @@ class Items extends React.Component {
             </View>
             <View style={{ flexDirection: 'row' }}>
               <Text style={styles.itemsName}>
-                {this.props.store.restaurantStore.name}
+                {items[index].name}
               </Text>
               <Text style={styles.itemsTag}>
-                ショッピング
+                {items[index].tag}
               </Text>
             </View>
 
             <View style={{ flexDirection: 'row' }}>
               <Text style={styles.itemsDescription}>
-                ＄10以上のお買い上げでスタンプ１個
+                {items[index].shortDescription}
               </Text>
               <TouchableOpacity
                 style={styles.likeButtonBox}
@@ -92,6 +106,7 @@ class Items extends React.Component {
   }
 
   render() {
+    console.log(this.items);
     return (
       <ScrollView
         style={styles.container}
@@ -144,7 +159,8 @@ const styles = StyleSheet.create({
     paddingRight: 4,
   },
   itemsDescription: {
-    width: '60%',
+    width: '65%',
+    height: '90%',
     fontSize: 9,
     color: '#707070',
     paddingTop: 5,
