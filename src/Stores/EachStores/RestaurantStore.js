@@ -1,14 +1,25 @@
-import { observable } from 'mobx';
+import { observable, action } from 'mobx';
+import firebase from 'firebase';
 
 class RestaurantStore {
-  @observable
-  name = 'コンビニ';
+ @observable Items = [];
 
-  @observable
-  tag = 'ショッピング';
-
-  @observable
-  shortDescription = '＄10以上のお買い上げでスタンプ１個';
+ @action handleFirestoreCollectionOfFoods () {
+   const db = firebase.firestore();
+   db.collection('foods')
+     .get()
+     .then((snapshot) => {
+       const preItems = [];
+       snapshot.forEach((doc) => {
+         const docData = doc.data();
+         preItems.push(docData);
+       });
+       this.Items.push(preItems);
+     })
+     .catch((error) => {
+       console.log(error);
+     });
+ }
 }
 
 export default RestaurantStore;

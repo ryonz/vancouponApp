@@ -8,7 +8,6 @@ import {
   TouchableOpacity,
   Dimensions,
 } from 'react-native';
-import firebase from 'firebase';
 import { inject, observer } from 'mobx-react/native';
 
 @inject('store')
@@ -16,26 +15,14 @@ import { inject, observer } from 'mobx-react/native';
 class Items extends React.Component {
   state = {
     like: false,
-    items: [],
   }
 
   componentDidMount() {
-    const db = firebase.firestore();
-    db.collection('foods')
-      .get()
-      .then((snapshot) => {
-        const items = [];
-        snapshot.forEach((doc) => {
-          const docId = doc.id;
-          const docData = doc.data();
-          items.push(docData);
-          console.log(docData);
-        });
-        this.setState({ items });
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    const { store } = this.props;
+    const restaurantStore = store.restaurantStore;
+    restaurantStore.handleFirestoreCollectionOfFoods();
+    console.log(this.props.store.restaurantStore.Items);
+
   }
 
   handleLikeButton() {
@@ -66,7 +53,8 @@ class Items extends React.Component {
   }
 
   renderItemBox() {
-    const items = this.state.items;
+    const { store } = this.props;
+    const items = store.restaurantStore.Items;
     return items.map((value, index) => {
       const { store } = this.props;
       const { restaurantStore } = store;
@@ -81,16 +69,16 @@ class Items extends React.Component {
             </View>
             <View style={{ flexDirection: 'row' }}>
               <Text style={styles.itemsName}>
-                {items[index].name}
+                {value[index].name}
               </Text>
               <Text style={styles.itemsTag}>
-                {items[index].tag}
+                {value[index].tag}
               </Text>
             </View>
 
             <View style={{ flexDirection: 'row' }}>
               <Text style={styles.itemsDescription}>
-                {items[index].shortDescription}
+                {value[index].shortDescription}
               </Text>
               <TouchableOpacity
                 style={styles.likeButtonBox}
@@ -106,7 +94,6 @@ class Items extends React.Component {
   }
 
   render() {
-    console.log(this.items);
     return (
       <ScrollView
         style={styles.container}
