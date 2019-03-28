@@ -17,12 +17,13 @@ class Items extends React.Component {
     like: false,
   }
 
-  componentDidMount() {
+  async componentWillMount() {
     const { store } = this.props;
     const restaurantStore = store.restaurantStore;
-    restaurantStore.handleFirestoreCollectionOfFoods();
-    console.log(this.props.store.restaurantStore.Items);
-
+    await restaurantStore.handleFirestoreCollectionOfFoods();
+    // const items = this.props.store.restaurantStore.Items.slice();
+    // this.setState({ items });
+    // console.log(this.props.store.restaurantStore.Items)
   }
 
   handleLikeButton() {
@@ -55,9 +56,7 @@ class Items extends React.Component {
   renderItemBox() {
     const { store } = this.props;
     const items = store.restaurantStore.Items;
-    return items.map((value, index) => {
-      const { store } = this.props;
-      const { restaurantStore } = store;
+    return items.map((value, index, array) => {
       return (
         <TouchableOpacity key={index}>
           <View style={styles.itemsBox}>
@@ -69,16 +68,16 @@ class Items extends React.Component {
             </View>
             <View style={{ flexDirection: 'row' }}>
               <Text style={styles.itemsName}>
-                {value[index].name}
+                {value.name}
               </Text>
               <Text style={styles.itemsTag}>
-                {value[index].tag}
+                {value.tag}
               </Text>
             </View>
 
             <View style={{ flexDirection: 'row' }}>
               <Text style={styles.itemsDescription}>
-                {value[index].shortDescription}
+                {value.shortDescription}
               </Text>
               <TouchableOpacity
                 style={styles.likeButtonBox}
@@ -94,6 +93,9 @@ class Items extends React.Component {
   }
 
   render() {
+    // if (this.props.store.restaurantStore.Items.length  ) {
+    //   return <View/>
+    // }
     return (
       <ScrollView
         style={styles.container}

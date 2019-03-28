@@ -4,17 +4,16 @@ import firebase from 'firebase';
 class RestaurantStore {
  @observable Items = [];
 
- @action handleFirestoreCollectionOfFoods () {
+ @action.bound handleFirestoreCollectionOfFoods () {
    const db = firebase.firestore();
+   this.Items.length = 0;
    db.collection('foods')
      .get()
      .then((snapshot) => {
-       const preItems = [];
        snapshot.forEach((doc) => {
          const docData = doc.data();
-         preItems.push(docData);
+         this.Items.push(docData);
        });
-       this.Items.push(preItems);
      })
      .catch((error) => {
        console.log(error);
