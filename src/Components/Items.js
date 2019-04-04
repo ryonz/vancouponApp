@@ -8,22 +8,35 @@ import {
   TouchableOpacity,
   Dimensions,
 } from 'react-native';
+import firebase from 'firebase';
 import { inject, observer } from 'mobx-react/native';
+import Modal from 'react-native-modalbox';
+import ShopModal from './ShopModal';
 
 @inject('store')
 @observer
 class Items extends React.Component {
-  state = {
-    like: false,
+  constructor() {
+    super();
+    this.state = {
+      index: null,
+      tag: null,
+      like: false,
+      modalVisible: false,
+      imageUrl: '',
+    };
   }
 
   async componentWillMount() {
     const { store } = this.props;
     const restaurantStore = store.restaurantStore;
     await restaurantStore.handleFirestoreCollectionOfFoods();
-    // const items = this.props.store.restaurantStore.Items.slice();
-    // this.setState({ items });
-    // console.log(this.props.store.restaurantStore.Items)
+
+    const ref = firebase.storage().ref().child('IMG_6536.JPG');
+    ref.getDownloadURL().then((url) => {
+      this.setState({ imageUrl: url });
+      console.log(url);
+    });
   }
 
   handleLikeButton() {
@@ -53,56 +66,80 @@ class Items extends React.Component {
     );
   }
 
+  modalHandler() {
+    const { modalVisible } = this.state;
+    if (modalVisible === false) {
+      this.setState({ modalVisible: true });
+    } else if (modalVisible === true) {
+      this.setState({ modalVisible: false });
+    }
+  }
+
   renderItemBox() {
     const { store } = this.props;
     const items = store.restaurantStore.Items;
-    return items.map((value, index, array) => {
-      return (
-        <TouchableOpacity key={index}>
-          <View style={styles.itemsBox}>
-            <View style={styles.itemsImageBox}>
-              <Image
-                source={require('../../assets/Images/Home/HomeListImageShop.jpg')}
-                style={styles.itemsImage}
-              />
-            </View>
-            <View style={{ flexDirection: 'row' }}>
-              <Text style={styles.itemsName}>
-                {value.name}
-              </Text>
-              <Text style={styles.itemsTag}>
-                {value.tag}
-              </Text>
-            </View>
 
-            <View style={{ flexDirection: 'row' }}>
-              <Text style={styles.itemsDescription}>
-                {value.shortDescription}
-              </Text>
-              <TouchableOpacity
-                style={styles.likeButtonBox}
-                onPress={this.handleLikeButton.bind(this)}
-              >
-                {this.handleLikeImage()}
-              </TouchableOpacity>
-            </View>
+    return items.map((value, index, array) => (
+      <TouchableOpacity
+        key={index}
+        onPress={this.modalHandler.bind(this)}
+      >
+        <View style={styles.itemsBox}>
+          <View style={styles.itemsImageBox}>
+            <Image
+              source={{ uri: this.state.imageUrl }}
+              //source={require('../../assets/Images/Home/HomeListImageShop.jpg')}
+              style={styles.itemsImage}
+            />
           </View>
-        </TouchableOpacity>
-      );
-    });
+          <View style={{ flexDirection: 'row' }}>
+            <Text style={styles.itemsName}>
+              {value.name}
+            </Text>
+            <Text style={styles.itemsTag}>
+              {value.tag}
+            </Text>
+          </View>
+
+          <View style={{ flexDirection: 'row' }}>
+            <Text style={styles.itemsDescription}>
+              {value.shortDescription}
+            </Text>
+            <TouchableOpacity
+              style={styles.likeButtonBox}
+              onPress={this.handleLikeButton.bind(this)}
+            >
+              {this.handleLikeImage()}
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        <Modal
+          key={index}
+          style={styles.shopModalView}
+          isOpen={this.state.modalVisible}
+          coverScreen
+        >
+          <ShopModal />
+        </Modal>
+      </TouchableOpacity>
+    ));
   }
 
+
   render() {
+    //const { modalVisible } = this.state;
     // if (this.props.store.restaurantStore.Items.length  ) {
     //   return <View/>
     // }
     return (
-      <ScrollView
-        style={styles.container}
-        contentContainerStyle={{ flexDirection: 'row', flexWrap: 'wrap' }}
-      >
-        {this.renderItemBox()}
-      </ScrollView>
+      <View style={styles.container}>
+        <ScrollView
+          contentContainerStyle={{ flexDirection: 'row', flexWrap: 'wrap' }}
+        >
+          {this.renderItemBox()}
+        </ScrollView>
+      </View>
     );
   }
 }
@@ -162,6 +199,9 @@ const styles = StyleSheet.create({
   likeButton: {
     width: 18,
     height: 18,
+  },
+  shopModalView: {
+    position: 'absolute',
   },
 });
 

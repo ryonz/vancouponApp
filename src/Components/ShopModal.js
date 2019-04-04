@@ -3,17 +3,21 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
+  Dimensions,
   View,
   Text,
   Image,
   Modal,
 } from 'react-native';
+import { observer, inject } from 'mobx-react';
 import Map from './Map';
 import CouponModalOnce from './CouponModals/CouponModalOnce';
 import CouponModalRepetition from './CouponModals/CouponModalRepetition';
 import CouponModalPoint from './CouponModals/CouponModalPoint';
 import QrcodeReader from './QrcodeReader';
 
+@inject('store')
+@observer
 class ShopModal extends React.Component {
   state = {
     mainImage: require('../../assets/Images/Home/HomeHeaderImage1024_683.jpg'),
@@ -80,112 +84,117 @@ class ShopModal extends React.Component {
 
       QRcodeScannerModalStatus,
     } = this.state;
+
     return (
       <View style={styles.container}>
-        <ScrollView>
-          <View style={styles.mainImageBox}>
-            <Image
-              style={styles.mainImage}
-              source={mainImage}
-            />
-          </View>
-          <View style={styles.titleBox}>
-            <View style={styles.titleBoxFirstLine}>
-              <Text style={styles.shopTitle}>{title}</Text>
-              <Text style={styles.shopTags}>{genreTag}</Text>
-              <Text style={styles.shopTags}>{couponTag}</Text>
+        <ScrollView style={styles.innerContainer}>
+          <View style={styles.backgroundBox}>
+
+            <View style={styles.mainImageBox}>
+              <Image
+                style={styles.mainImage}
+                source={mainImage}
+              />
+            </View>
+            <View style={styles.titleBox}>
+              <View style={styles.titleBoxFirstLine}>
+                <Text style={styles.shopTitle}>{title}</Text>
+                <Text style={styles.shopTags}>{genreTag}</Text>
+                <Text style={styles.shopTags}>{couponTag}</Text>
+              </View>
+
+              <TouchableOpacity
+                style={styles.likeButtonBox}
+              >
+                {this.handleLikeButton()}
+              </TouchableOpacity>
+
+              <View style={styles.titleBoxSecondLine}>
+                <Text style={styles.shortDescription}>{shortDescription}</Text>
+              </View>
             </View>
 
-            <TouchableOpacity
-              style={styles.likeButtonBox}
-            >
-              {this.handleLikeButton()}
-            </TouchableOpacity>
+            <Text style={styles.boxTitle}>詳細</Text>
 
-            <View style={styles.titleBoxSecondLine}>
-              <Text style={styles.shortDescription}>{shortDescription}</Text>
-            </View>
-          </View>
+            <View style={styles.detailBox}>
+              <View style={styles.detailEachBox}>
+                <Image style={styles.iconImage} source={require('../../assets/Images/Icons/star.png')} />
+                <Text style={styles.detailText}>{catchCopy}</Text>
+              </View>
 
-          <Text style={styles.boxTitle}>詳細</Text>
+              <View style={styles.detailEachBoxUnderBar} />
 
-          <View style={styles.detailBox}>
-            <View style={styles.detailEachBox}>
-              <Image style={styles.iconImage} source={require('../../assets/Images/Icons/star.png')} />
-              <Text style={styles.detailText}>{catchCopy}</Text>
-            </View>
+              <TouchableOpacity style={styles.detailEachBox}>
+                <Image style={styles.iconImage} source={require('../../assets/Images/Icons/auricular-phone-symbol-in-a-circle.png')} />
+                <Text style={styles.detailText}>{phoneNumber}</Text>
+              </TouchableOpacity>
 
-            <View style={styles.detailEachBoxUnderBar} />
+              <View style={styles.detailEachBoxUnderBar} />
 
-            <TouchableOpacity style={styles.detailEachBox}>
-              <Image style={styles.iconImage} source={require('../../assets/Images/Icons/auricular-phone-symbol-in-a-circle.png')} />
-              <Text style={styles.detailText}>{phoneNumber}</Text>
-            </TouchableOpacity>
+              <View style={styles.detailEachBox}>
+                <Image style={styles.iconImage} source={require('../../assets/Images/Icons/clock-circular-outline.png')} />
+                <Text style={styles.detailText}>{time}</Text>
+              </View>
 
-            <View style={styles.detailEachBoxUnderBar} />
+              <View style={styles.detailEachBoxUnderBar} />
 
-            <View style={styles.detailEachBox}>
-              <Image style={styles.iconImage} source={require('../../assets/Images/Icons/clock-circular-outline.png')} />
-              <Text style={styles.detailText}>{time}</Text>
+              <TouchableOpacity style={styles.detailEachBox}>
+                <Image style={styles.iconImage} source={require('../../assets/Images/Icons/led-monitor.png')} />
+                <Text style={styles.detailText}>{webPage}</Text>
+              </TouchableOpacity>
             </View>
 
-            <View style={styles.detailEachBoxUnderBar} />
+            {/* 地図 */}
+            <View style={styles.mapContainerBox}>
+              <Map style={styles.mapContainer} />
+              <View style={styles.addressContainerBox}>
+                <View style={styles.iconAndAddressBox}>
+                  <Image style={styles.mapIconImage} source={require('../../assets/Images/Icons/placeholder-filled-point.png')} />
+                  <Text style={styles.addressText}>{address}</Text>
+                </View>
+              </View>
+            </View>
 
-            <TouchableOpacity style={styles.detailEachBox}>
-              <Image style={styles.iconImage} source={require('../../assets/Images/Icons/led-monitor.png')} />
-              <Text style={styles.detailText}>{webPage}</Text>
-            </TouchableOpacity>
-          </View>
 
-          {/* 地図 */}
-          <View style={styles.mapContainerBox}>
-            <Map style={styles.mapContainer} />
-            <View style={styles.addressContainerBox}>
-              <View style={styles.iconAndAddressBox}>
-                <Image style={styles.mapIconImage} source={require('../../assets/Images/Icons/placeholder-filled-point.png')} />
-                <Text style={styles.addressText}>{address}</Text>
+            <Text style={styles.boxTitle}>お店の紹介</Text>
+
+
+            <View style={styles.shopDescriptionBox}>
+              <Text style={styles.shopDescription}>{longDescription}</Text>
+            </View>
+
+            <Text style={styles.boxTitle}>クーポン利用の注意点</Text>
+
+            <View style={styles.noteAboutCouponBox}>
+              <Text style={styles.noteAboutCouponText}>{note1}</Text>
+              <Text style={styles.noteAboutCouponText}>{note2}</Text>
+              <Text style={styles.noteAboutCouponText}>{note3}</Text>
+              <Text style={styles.noteAboutCouponText}>{note4}</Text>
+            </View>
+
+            <Text style={styles.boxTitle}>SNS</Text>
+
+            <View style={styles.snsBox}>
+              <View style={styles.eachSnsBox}>
+                <Image style={styles.iconImage} source={require('../../assets/Images/Icons/facebook.png')} />
+                <Text style={styles.snsText}>{facebook}</Text>
+              </View>
+
+              <View style={styles.detailEachBoxUnderBar} />
+
+              <View style={styles.eachSnsBox}>
+                <Image style={styles.iconImage} source={require('../../assets/Images/Icons/twitter.png')} />
+                <Text style={styles.snsText}>{twitter}</Text>
+              </View>
+
+              <View style={styles.detailEachBoxUnderBar} />
+
+              <View style={styles.eachSnsBox}>
+                <Image style={styles.iconImage} source={require('../../assets/Images/Icons/instagram.png')} />
+                <Text style={styles.snsText}>{instagram}</Text>
               </View>
             </View>
           </View>
-
-          <Text style={styles.boxTitle}>お店の紹介</Text>
-
-          <View style={styles.shopDescriptionBox}>
-            <Text style={styles.shopDescription}>{longDescription}</Text>
-          </View>
-
-          <Text style={styles.boxTitle}>クーポン利用の注意点</Text>
-
-          <View style={styles.noteAboutCouponBox}>
-            <Text style={styles.noteAboutCouponText}>{note1}</Text>
-            <Text style={styles.noteAboutCouponText}>{note2}</Text>
-            <Text style={styles.noteAboutCouponText}>{note3}</Text>
-            <Text style={styles.noteAboutCouponText}>{note4}</Text>
-          </View>
-
-          <Text style={styles.boxTitle}>SNS</Text>
-
-          <View style={styles.snsBox}>
-            <View style={styles.eachSnsBox}>
-              <Image style={styles.iconImage} source={require('../../assets/Images/Icons/facebook.png')} />
-              <Text style={styles.snsText}>{facebook}</Text>
-            </View>
-
-            <View style={styles.detailEachBoxUnderBar} />
-
-            <View style={styles.eachSnsBox}>
-              <Image style={styles.iconImage} source={require('../../assets/Images/Icons/twitter.png')} />
-              <Text style={styles.snsText}>{twitter}</Text>
-            </View>
-
-            <View style={styles.detailEachBoxUnderBar} />
-
-            <View style={styles.eachSnsBox}>
-              <Image style={styles.iconImage} source={require('../../assets/Images/Icons/instagram.png')} />
-              <Text style={styles.snsText}>{instagram}</Text>
-            </View>
-          </View>
-
         </ScrollView>
 
         <TouchableOpacity
@@ -210,6 +219,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     width: '100%',
+    backgroundColor: 'transparent',
+  },
+  backgroundBox: {
     backgroundColor: '#F0F0F0',
   },
   mainImageBox: {
@@ -309,7 +321,7 @@ const styles = StyleSheet.create({
   mapContainerBox: {
     alignItems: 'center',
     width: '100%',
-    height: 172,
+    //height: 172,
     marginTop: 8,
     marginBottom: 9,
     shadowColor: '#000000',
@@ -404,7 +416,7 @@ const styles = StyleSheet.create({
   },
   couponModalBox: {
     position: 'absolute',
-    bottom: 10,
+    bottom: 40,
     width: '100%',
     height: 120,
     alignItems: 'center',

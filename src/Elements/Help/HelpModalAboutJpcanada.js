@@ -6,7 +6,7 @@ import {
   ScrollView,
   Dimensions,
 } from 'react-native';
-import Modal from 'react-native-modal';
+import Modal from 'react-native-modalbox';
 
 const HEIGHT = Dimensions.get('window').height;
 
