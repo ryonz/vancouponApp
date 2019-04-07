@@ -7,7 +7,6 @@ import {
   ScrollView,
   Image,
 } from 'react-native';
-import { observer, inject } from 'mobx-react/native';
 
 const listImageSource = {
   food: require('../../../assets/Images/Home/HomeListImageFood.jpg'),

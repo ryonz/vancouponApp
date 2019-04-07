@@ -2,9 +2,11 @@ import { observable, action } from 'mobx';
 import firebase from 'firebase';
 
 class RestaurantStore {
- @observable Items = [];
+ @observable
+ Items = [];
 
- @action.bound handleFirestoreCollectionOfFoods () {
+ @action.bound
+ handleFirestoreCollectionOfFoods () {
    const db = firebase.firestore();
    this.Items.length = 0;
    db.collection('foods')

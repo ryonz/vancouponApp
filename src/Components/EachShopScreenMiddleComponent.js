@@ -10,9 +10,10 @@ import Items from './Items';
 @observer
 class EachShopScreenMiddleComponent extends React.Component {
   render() {
+    const { navigation } = this.props;
     return (
       <View style={styles.container}>
-        <Items />
+        <Items navigation={navigation} />
       </View>
     );
   }

@@ -8,10 +8,7 @@ import {
   TouchableOpacity,
   Dimensions,
 } from 'react-native';
-import firebase from 'firebase';
 import { inject, observer } from 'mobx-react/native';
-import Modal from 'react-native-modalbox';
-import ShopModal from './ShopModal';
 
 @inject('store')
 @observer
@@ -19,11 +16,7 @@ class Items extends React.Component {
   constructor() {
     super();
     this.state = {
-      index: null,
-      tag: null,
       like: false,
-      modalVisible: false,
-      imageUrl: '',
     };
   }
 
@@ -32,11 +25,6 @@ class Items extends React.Component {
     const restaurantStore = store.restaurantStore;
     await restaurantStore.handleFirestoreCollectionOfFoods();
 
-    const ref = firebase.storage().ref().child('IMG_6536.JPG');
-    ref.getDownloadURL().then((url) => {
-      this.setState({ imageUrl: url });
-      console.log(url);
-    });
   }
 
   handleLikeButton() {
@@ -66,13 +54,10 @@ class Items extends React.Component {
     );
   }
 
-  modalHandler() {
-    const { modalVisible } = this.state;
-    if (modalVisible === false) {
-      this.setState({ modalVisible: true });
-    } else if (modalVisible === true) {
-      this.setState({ modalVisible: false });
-    }
+  shopModalHandler(value) {
+    //console.log(value);
+    const { navigate } = this.props.navigation;
+    navigate('ShopModal', { value });
   }
 
   renderItemBox() {
@@ -82,13 +67,12 @@ class Items extends React.Component {
     return items.map((value, index, array) => (
       <TouchableOpacity
         key={index}
-        onPress={this.modalHandler.bind(this)}
+        onPress={() => { this.shopModalHandler(value); }}
       >
         <View style={styles.itemsBox}>
           <View style={styles.itemsImageBox}>
             <Image
-              source={{ uri: this.state.imageUrl }}
-              //source={require('../../assets/Images/Home/HomeListImageShop.jpg')}
+              source={{ uri: value.mainImageUrl }}
               style={styles.itemsImage}
             />
           </View>
@@ -114,14 +98,6 @@ class Items extends React.Component {
           </View>
         </View>
 
-        <Modal
-          key={index}
-          style={styles.shopModalView}
-          isOpen={this.state.modalVisible}
-          coverScreen
-        >
-          <ShopModal />
-        </Modal>
       </TouchableOpacity>
     ));
   }

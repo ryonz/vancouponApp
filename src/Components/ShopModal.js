@@ -9,36 +9,15 @@ import {
   Image,
   Modal,
 } from 'react-native';
-import { observer, inject } from 'mobx-react';
+import { observer } from 'mobx-react';
 import Map from './Map';
 import CouponModalOnce from './CouponModals/CouponModalOnce';
 import CouponModalRepetition from './CouponModals/CouponModalRepetition';
 import CouponModalPoint from './CouponModals/CouponModalPoint';
 import QrcodeReader from './QrcodeReader';
 
-@inject('store')
-@observer
 class ShopModal extends React.Component {
   state = {
-    mainImage: require('../../assets/Images/Home/HomeHeaderImage1024_683.jpg'),
-    title: 'コンビニ屋',
-    genreTag: '#ショッピング',
-    couponTag: '#クーポン有り',
-    shortDescription: 'みんなが集まり安い空間づくりを目指しています。スタッフは全員日本人！困ったことがあればお気軽に聞いてください。',
-    catchCopy: '日本商品のコンビニエンスストア',
-    phoneNumber: '604-682-3634',
-    time: '11:00~24:00',
-    webPage: 'konbiniya.com',
-    address: '1238 Robson St.',
-    longDescription: 'ロブソン通りに面したコンビニ屋には「カナダでは手に入らないかも」と思うような日本の食品や日用品がずらり。お菓子屋インスタントフード、調味料、飲料など約1万を超える品揃えで、いわば日本のデパート。他店で取り扱いのない新商品なども毎月入荷し日替わり週替わりセールや特売品があるためウェブでチェック！',
-    note1: '・＄10以上のお買い上げでスタンプ一個',
-    note2: '・一部対象外の商品（タバコ、テレフォンカードなど）有り',
-    note3: '・他の特典とは併用できません',
-    note4: '',
-    facebook: 'Konbiniya Japan Center',
-    twitter: '@konbiniya',
-    instagram: '#Konbiniya',
-
     QRcodeScannerModalStatus: false,
   }
 
@@ -63,27 +42,10 @@ class ShopModal extends React.Component {
 
   render() {
     const {
-      mainImage,
-      title,
-      genreTag,
-      couponTag,
-      shortDescription,
-      catchCopy,
-      phoneNumber,
-      time,
-      webPage,
-      address,
-      longDescription,
-      note1,
-      note2,
-      note3,
-      note4,
-      facebook,
-      twitter,
-      instagram,
-
       QRcodeScannerModalStatus,
     } = this.state;
+
+    const { value } = this.props.navigation.state.params;
 
     return (
       <View style={styles.container}>
@@ -93,14 +55,14 @@ class ShopModal extends React.Component {
             <View style={styles.mainImageBox}>
               <Image
                 style={styles.mainImage}
-                source={mainImage}
+                source={{ uri: value.mainImageUrl }}
               />
             </View>
             <View style={styles.titleBox}>
               <View style={styles.titleBoxFirstLine}>
-                <Text style={styles.shopTitle}>{title}</Text>
-                <Text style={styles.shopTags}>{genreTag}</Text>
-                <Text style={styles.shopTags}>{couponTag}</Text>
+                <Text style={styles.shopTitle}>{value.name}</Text>
+                <Text style={styles.shopTags}>{value.genreTag}</Text>
+                <Text style={styles.shopTags}>{value.couponTag}</Text>
               </View>
 
               <TouchableOpacity
@@ -110,7 +72,7 @@ class ShopModal extends React.Component {
               </TouchableOpacity>
 
               <View style={styles.titleBoxSecondLine}>
-                <Text style={styles.shortDescription}>{shortDescription}</Text>
+                <Text style={styles.shortDescription}>{value.shortDescription}</Text>
               </View>
             </View>
 
@@ -119,28 +81,28 @@ class ShopModal extends React.Component {
             <View style={styles.detailBox}>
               <View style={styles.detailEachBox}>
                 <Image style={styles.iconImage} source={require('../../assets/Images/Icons/star.png')} />
-                <Text style={styles.detailText}>{catchCopy}</Text>
+                <Text style={styles.detailText}>{value.catchCopy}</Text>
               </View>
 
               <View style={styles.detailEachBoxUnderBar} />
 
               <TouchableOpacity style={styles.detailEachBox}>
                 <Image style={styles.iconImage} source={require('../../assets/Images/Icons/auricular-phone-symbol-in-a-circle.png')} />
-                <Text style={styles.detailText}>{phoneNumber}</Text>
+                <Text style={styles.detailText}>{value.phoneNumber}</Text>
               </TouchableOpacity>
 
               <View style={styles.detailEachBoxUnderBar} />
 
               <View style={styles.detailEachBox}>
                 <Image style={styles.iconImage} source={require('../../assets/Images/Icons/clock-circular-outline.png')} />
-                <Text style={styles.detailText}>{time}</Text>
+                <Text style={styles.detailText}>{value.time}</Text>
               </View>
 
               <View style={styles.detailEachBoxUnderBar} />
 
               <TouchableOpacity style={styles.detailEachBox}>
                 <Image style={styles.iconImage} source={require('../../assets/Images/Icons/led-monitor.png')} />
-                <Text style={styles.detailText}>{webPage}</Text>
+                <Text style={styles.detailText}>{value.webPage}</Text>
               </TouchableOpacity>
             </View>
 
@@ -150,7 +112,7 @@ class ShopModal extends React.Component {
               <View style={styles.addressContainerBox}>
                 <View style={styles.iconAndAddressBox}>
                   <Image style={styles.mapIconImage} source={require('../../assets/Images/Icons/placeholder-filled-point.png')} />
-                  <Text style={styles.addressText}>{address}</Text>
+                  <Text style={styles.addressText}>{value.address}</Text>
                 </View>
               </View>
             </View>
@@ -160,16 +122,16 @@ class ShopModal extends React.Component {
 
 
             <View style={styles.shopDescriptionBox}>
-              <Text style={styles.shopDescription}>{longDescription}</Text>
+              <Text style={styles.shopDescription}>{value.longDescription}</Text>
             </View>
 
             <Text style={styles.boxTitle}>クーポン利用の注意点</Text>
 
             <View style={styles.noteAboutCouponBox}>
-              <Text style={styles.noteAboutCouponText}>{note1}</Text>
-              <Text style={styles.noteAboutCouponText}>{note2}</Text>
-              <Text style={styles.noteAboutCouponText}>{note3}</Text>
-              <Text style={styles.noteAboutCouponText}>{note4}</Text>
+              <Text style={styles.noteAboutCouponText}>{value.note1}</Text>
+              <Text style={styles.noteAboutCouponText}>{value.note2}</Text>
+              <Text style={styles.noteAboutCouponText}>{value.note3}</Text>
+              <Text style={styles.noteAboutCouponText}>{value.note4}</Text>
             </View>
 
             <Text style={styles.boxTitle}>SNS</Text>
@@ -177,21 +139,21 @@ class ShopModal extends React.Component {
             <View style={styles.snsBox}>
               <View style={styles.eachSnsBox}>
                 <Image style={styles.iconImage} source={require('../../assets/Images/Icons/facebook.png')} />
-                <Text style={styles.snsText}>{facebook}</Text>
+                <Text style={styles.snsText}>{value.facebook}</Text>
               </View>
 
               <View style={styles.detailEachBoxUnderBar} />
 
               <View style={styles.eachSnsBox}>
                 <Image style={styles.iconImage} source={require('../../assets/Images/Icons/twitter.png')} />
-                <Text style={styles.snsText}>{twitter}</Text>
+                <Text style={styles.snsText}>{value.twitter}</Text>
               </View>
 
               <View style={styles.detailEachBoxUnderBar} />
 
               <View style={styles.eachSnsBox}>
                 <Image style={styles.iconImage} source={require('../../assets/Images/Icons/instagram.png')} />
-                <Text style={styles.snsText}>{instagram}</Text>
+                <Text style={styles.snsText}>{value.instagram}</Text>
               </View>
             </View>
           </View>
@@ -397,7 +359,7 @@ const styles = StyleSheet.create({
   snsBox: {
     width: '100%',
     height: 'auto',
-    marginBottom: 150,
+    marginBottom: 200,
     backgroundColor: '#fff',
     borderWidth: 0.3,
     borderColor: '#707070',
