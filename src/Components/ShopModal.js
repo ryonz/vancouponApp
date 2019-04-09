@@ -9,7 +9,7 @@ import {
   Image,
   Modal,
 } from 'react-native';
-import { observer } from 'mobx-react';
+import { Button } from 'react-native-elements';
 import Map from './Map';
 import CouponModalOnce from './CouponModals/CouponModalOnce';
 import CouponModalRepetition from './CouponModals/CouponModalRepetition';
@@ -19,6 +19,16 @@ import QrcodeReader from './QrcodeReader';
 class ShopModal extends React.Component {
   state = {
     QRcodeScannerModalStatus: false,
+    detailTimeModal: false,
+  }
+
+  onPressDetailTime() {
+    const { detailTimeModal } = this.state;
+    if (!detailTimeModal) {
+      this.setState({ detailTimeModal: true });
+    } else if (detailTimeModal) {
+      this.setState({ detailTimeModal: false });
+    }
   }
 
   handleOpenQRcodeScaner = () => {
@@ -38,6 +48,62 @@ class ShopModal extends React.Component {
     return <CouponModalPoint />;
     // return <CouponModalRepetition />;
     // return <CouponModalOnce />;
+  }
+
+  //曜日ごとに表示する時間帯を変更
+
+  renderDetailTime() {
+    const { value } = this.props.navigation.state.params;
+    const date = new Date();
+    const dayOfWeek = date.getDay();
+    console.log(dayOfWeek);
+    if (dayOfWeek === 0) {
+      return <Text style={styles.detailTextTime}>{value.time0}</Text>;
+    } if (dayOfWeek === 1) {
+      return <Text style={styles.detailTextTime}>{value.time1}</Text>;
+    } if (dayOfWeek === 2) {
+      return <Text style={styles.detailTextTime}>{value.time2}</Text>;
+    } if (dayOfWeek === 3) {
+      return <Text style={styles.detailTextTime}>{value.time3}</Text>;
+    } if (dayOfWeek === 4) {
+      return <Text style={styles.detailTextTime}>{value.time4}</Text>;
+    } if (dayOfWeek === 5) {
+      return <Text style={styles.detailTextTime}>{value.time5}</Text>;
+    } if (dayOfWeek === 6) {
+      return <Text style={styles.detailTextTime}>{value.time6}</Text>;
+    }
+  }
+
+  renderDetailTimeModal() {
+    const { detailTimeModal } = this.state;
+    const { value } = this.props.navigation.state.params;
+    return (
+      <Modal
+        style={styles.detailTimeModalBox}
+        visible={detailTimeModal}
+        transparent
+      >
+        <View style={styles.detailTimeModal}>
+          <View style={styles.detailTimeModalTextBox}>
+            <Text style={styles.detailTimeModalText}>営業時間</Text>
+            <Text style={styles.detailTimeModalText}>{value.time0}</Text>
+            <Text style={styles.detailTimeModalText}>{value.time1}</Text>
+            <Text style={styles.detailTimeModalText}>{value.time2}</Text>
+            <Text style={styles.detailTimeModalText}>{value.time3}</Text>
+            <Text style={styles.detailTimeModalText}>{value.time4}</Text>
+            <Text style={styles.detailTimeModalText}>{value.time5}</Text>
+            <Text style={styles.detailTimeModalText}>{value.time6}</Text>
+          </View>
+
+          <View style={styles.detailTimeModalButtonBox}>
+            <Button
+              title="閉じる"
+              onPress={() => { this.setState({ detailTimeModal: false }); }}
+            />
+          </View>
+        </View>
+      </Modal>
+    );
   }
 
   render() {
@@ -93,10 +159,16 @@ class ShopModal extends React.Component {
 
               <View style={styles.detailEachBoxUnderBar} />
 
-              <View style={styles.detailEachBox}>
-                <Image style={styles.iconImage} source={require('../../assets/Images/Icons/clock-circular-outline.png')} />
-                <Text style={styles.detailText}>{value.time}</Text>
-              </View>
+              <TouchableOpacity
+                style={styles.detailEachBox}
+                onPress={() => { this.onPressDetailTime(); }}
+              >
+                <Image
+                  style={styles.iconImage}
+                  source={require('../../assets/Images/Icons/clock-circular-outline.png')}
+                />
+                {this.renderDetailTime()}
+              </TouchableOpacity>
 
               <View style={styles.detailEachBoxUnderBar} />
 
@@ -108,10 +180,21 @@ class ShopModal extends React.Component {
 
             {/* 地図 */}
             <View style={styles.mapContainerBox}>
-              <Map style={styles.mapContainer} />
+
+              <Map
+                style={styles.mapContainer}
+                latitude={value.latitude}
+                longitude={value.longitude}
+                // latitudeDelta={value.map.latitudeDelta}
+                // longitudeDelta={value.map.longitudeDelta}
+              />
+
               <View style={styles.addressContainerBox}>
                 <View style={styles.iconAndAddressBox}>
-                  <Image style={styles.mapIconImage} source={require('../../assets/Images/Icons/placeholder-filled-point.png')} />
+                  <Image
+                    style={styles.mapIconImage}
+                    source={require('../../assets/Images/Icons/placeholder-filled-point.png')}
+                  />
                   <Text style={styles.addressText}>{value.address}</Text>
                 </View>
               </View>
@@ -171,6 +254,8 @@ class ShopModal extends React.Component {
         >
           <QrcodeReader />
         </Modal>
+
+        {this.renderDetailTimeModal()}
 
       </View>
     );
@@ -252,7 +337,7 @@ const styles = StyleSheet.create({
   },
   detailBox: {
     width: '100%',
-    height: 125,
+    height: 'auto',
     backgroundColor: '#fff',
     borderWidth: 0.3,
     borderColor: '#707070',
@@ -261,6 +346,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     width: '100%',
     height: 30,
+    paddingTop: 11,
+  },
+  detailEachBoxTime: {
+    width: '100%',
+    height: 'auto',
     paddingTop: 11,
   },
   iconImage: {
@@ -272,6 +362,13 @@ const styles = StyleSheet.create({
     fontSize: 9,
     fontWeight: '500',
     color: '#707070',
+    marginLeft: 4,
+  },
+  detailTextTime: {
+    fontSize: 10,
+    fontWeight: '500',
+    color: '#1111cc',
+    textDecorationLine: 'underline',
     marginLeft: 4,
   },
   detailEachBoxUnderBar: {
@@ -383,6 +480,30 @@ const styles = StyleSheet.create({
     height: 120,
     alignItems: 'center',
   },
+  detailTimeModal: {
+    position: 'absolute',
+    alignItems: 'center',
+    bottom: Dimensions.get('window').height * 0.4,
+    marginLeft: Dimensions.get('window').width * 0.2,
+    width: '60%',
+    height: Dimensions.get('window').width * 0.8,
+    borderWidth: 0.2,
+    borderRadius: 10,
+    backgroundColor: '#fff',
+  },
+  detailTimeModalTextBox: {
+    alignItems: 'center',
+    margin: 15,
+  },
+  detailTimeModalText: {
+    fontWeight: '400',
+    paddingTop: 5,
+  },
+  detailTimeModalButtonBox: {
+    paddingTop: 20,
+  },
 });
 
 export default ShopModal;
+
+

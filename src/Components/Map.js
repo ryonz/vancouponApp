@@ -4,21 +4,21 @@ import MapView from 'react-native-maps';
 
 class Map extends React.Component {
   render() {
-    const { style } = this.props;
+    const { style, latitude, longitude } = this.props;
     return (
       <MapView
         style={style}
         initialRegion={{
-          latitude: 49.286352,
-          longitude: -123.127898,
+          latitude,
+          longitude,
           latitudeDelta: 0.005,
           longitudeDelta: 0.005,
         }}
       >
         <MapView.Marker
           coordinate={{
-            latitude: 49.286352,
-            longitude: -123.127898,
+            latitude,
+            longitude,
           }}
         />
       </MapView>
