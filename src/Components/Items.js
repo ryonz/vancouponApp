@@ -3,12 +3,13 @@ import {
   StyleSheet,
   View,
   Text,
-  Image,
+  ActivityIndicator,
   ScrollView,
   TouchableOpacity,
   Dimensions,
 } from 'react-native';
 import { inject, observer } from 'mobx-react/native';
+import { Image } from 'react-native-elements';
 
 @inject('store')
 @observer
@@ -74,6 +75,7 @@ class Items extends React.Component {
             <Image
               source={{ uri: value.mainImageUrl }}
               style={styles.itemsImage}
+              PlaceholderContent={<ActivityIndicator />}
             />
           </View>
           <View style={{ flexDirection: 'row' }}>

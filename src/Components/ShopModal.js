@@ -10,6 +10,7 @@ import {
   Modal,
 } from 'react-native';
 import { Button } from 'react-native-elements';
+import Icon from 'react-native-vector-icons/FontAwesome';
 import Map from './Map';
 import CouponModalOnce from './CouponModals/CouponModalOnce';
 import CouponModalRepetition from './CouponModals/CouponModalRepetition';
@@ -48,6 +49,10 @@ class ShopModal extends React.Component {
     return <CouponModalPoint />;
     // return <CouponModalRepetition />;
     // return <CouponModalOnce />;
+  }
+
+  handleBackButton() {
+    this.props.navigation.goBack();
   }
 
   //曜日ごとに表示する時間帯を変更
@@ -106,6 +111,42 @@ class ShopModal extends React.Component {
     );
   }
 
+  renderShopTags() {
+    const { value } = this.props.navigation.state.params;
+    if (value.genreTag && value.couponTag) {
+      return (
+        <View style={styles.titleBoxFirstLine}>
+          <Text style={styles.shopTitle}>{value.name}</Text>
+          <View style={styles.shopTagsBackground}>
+            <Text style={styles.shopTags}>{value.genreTag}</Text>
+          </View>
+          <View style={styles.shopTagsBackground}>
+            <Text style={styles.shopTags}>{value.couponTag}</Text>
+          </View>
+        </View>
+      );
+    } if (value.genreTag && !value.couponTag) {
+      return (
+        <View style={styles.titleBoxFirstLine}>
+          <Text style={styles.shopTitle}>{value.name}</Text>
+          <View style={styles.shopTagsBackground}>
+            <Text style={styles.shopTags}>{value.genreTag}</Text>
+          </View>
+        </View>
+      );
+    } if (!value.genreTag && value.couponTag) {
+      return (
+        <View style={styles.titleBoxFirstLine}>
+          <Text style={styles.shopTitle}>{value.name}</Text>
+          <View style={styles.shopTagsBackground}>
+            <Text style={styles.shopTags}>{value.couponTag}</Text>
+          </View>
+        </View>
+      );
+    }
+  }
+
+
   render() {
     const {
       QRcodeScannerModalStatus,
@@ -113,11 +154,12 @@ class ShopModal extends React.Component {
 
     const { value } = this.props.navigation.state.params;
 
+    console.log(value.shopTags);
+    console.log(value.genreTags);
     return (
       <View style={styles.container}>
         <ScrollView style={styles.innerContainer}>
           <View style={styles.backgroundBox}>
-
             <View style={styles.mainImageBox}>
               <Image
                 style={styles.mainImage}
@@ -125,11 +167,8 @@ class ShopModal extends React.Component {
               />
             </View>
             <View style={styles.titleBox}>
-              <View style={styles.titleBoxFirstLine}>
-                <Text style={styles.shopTitle}>{value.name}</Text>
-                <Text style={styles.shopTags}>{value.genreTag}</Text>
-                <Text style={styles.shopTags}>{value.couponTag}</Text>
-              </View>
+
+              {this.renderShopTags()}
 
               <TouchableOpacity
                 style={styles.likeButtonBox}
@@ -255,6 +294,16 @@ class ShopModal extends React.Component {
           <QrcodeReader />
         </Modal>
 
+        {/* バックボタン */}
+        <TouchableOpacity
+          style={styles.backButtonBox}
+          onPress={() => { this.handleBackButton(); }}
+        >
+          <View style={styles.backButton}>
+            <Icon name="chevron-left" style={styles.backButtonIcon} />
+          </View>
+        </TouchableOpacity>
+
         {this.renderDetailTimeModal()}
 
       </View>
@@ -270,6 +319,26 @@ const styles = StyleSheet.create({
   },
   backgroundBox: {
     backgroundColor: '#F0F0F0',
+  },
+  backButtonBox: {
+    position: 'absolute',
+    top: 50,
+    left: 20,
+    width: 50,
+    height: 50,
+  },
+  backButton: {
+    width: 50,
+    height: 50,
+    borderRadius: 50,
+    backgroundColor: 'rgba(111,111,111,0.2)',
+
+  },
+  backButtonIcon: {
+    fontSize: 23,
+    color: '#fff',
+    marginTop: 15,
+    marginLeft: 14,
   },
   mainImageBox: {
     width: '100%',
@@ -296,15 +365,19 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
   },
+  shopTagsBackground: {
+    backgroundColor: '#BCB8B8',
+    borderWidth: 0.1,
+    borderRadius: 5,
+    marginLeft: 7,
+  },
   shopTags: {
     color: '#fff',
-    fontSize: 9,
+    fontSize: 10,
     fontWeight: 'bold',
-    backgroundColor: '#BCB8B8',
     paddingTop: 5,
-    paddingLeft: 4,
-    paddingRight: 4,
-    marginLeft: 8,
+    paddingLeft: 5,
+    paddingRight: 5,
   },
   likeButtonBox: {
     position: 'absolute',
@@ -486,8 +559,8 @@ const styles = StyleSheet.create({
     bottom: Dimensions.get('window').height * 0.4,
     marginLeft: Dimensions.get('window').width * 0.2,
     width: '60%',
-    height: Dimensions.get('window').width * 0.8,
-    borderWidth: 0.2,
+    height: 'auto',
+    borderWidth: 0.4,
     borderRadius: 10,
     backgroundColor: '#fff',
   },
@@ -501,9 +574,8 @@ const styles = StyleSheet.create({
   },
   detailTimeModalButtonBox: {
     paddingTop: 20,
+    paddingBottom: 20,
   },
 });
 
 export default ShopModal;
-
-
