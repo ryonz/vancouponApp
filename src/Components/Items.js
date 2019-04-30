@@ -20,41 +20,56 @@ class Items extends React.Component {
     super();
     this.state = {
       like: false,
+      noImage: require('../../assets/Images/Images/noImage.001.jpeg'),
+      itemsArray: [],
     };
   }
 
   async componentDidMount() {
     const { store } = this.props;
     const restaurantStore = store.restaurantStore;
-    await restaurantStore.handleFirestoreCollectionOfFoods();
+    const beautyStore = store.beautyStore;
+    const shopStore = store.shopStore;
+    const sightseeingStore = store.sightseeingStore;
+    const entertainmentStore = store.entertainmentStore;
+    const hospitalStore = store.hospitalStore;
+    const othersStore = store.othersStore;
+    //await restaurantStore.handleFirestoreCollectionOfFoods();
     console.log(this.props.navigation.state.routeName);
 
-    // await AsyncStorage.getItem('openingGenre')
-    //   .then((openingGenreValue) => {
-    //     console.log(openingGenreValue);
-    //     if (this.props.navigation.state.routeName === 'EachShopGenreScreen') {
-    //       //開いてるページが飲食の場合
-    //       if (openingGenreValue === 'food') {
-    //         restaurantStore.handleFirestoreCollectionOfFoods();
-    //       } else if (openingGenreValue === 'shop') {
-    //       //ショップのストア読み込み
-    //       } else if (openingGenreValue === 'beauty') {
-    //         //ビューティのストア読み込み
-    //       } else if (openingGenreValue === 'sightseeing') {
-    //         //
-    //       } else if (openingGenreValue === 'entertainment') {
-    //         ///
-    //       } else if (openingGenreValue === 'hospital') {
-    //         ///
-    //       } else if (openingGenreValue === 'other') {
-    //         ///
-    //       } else {
-    //         Alert.alert('予期せぬ不具合が発生いたしました。再度お試し下さい');
-    //       }
-    //     } else if (this.props.navigation.state.routeName === 'Favorite') {
-    //       //お気に入りページの際の読み込み処理
-    //     }
-    //   });
+    await AsyncStorage.getItem('openingGenre')
+      .then((openingGenreValue) => {
+        console.log(openingGenreValue);
+        if (this.props.navigation.state.routeName === 'EachShopGenreScreen') {
+          if (openingGenreValue === 'food') {
+            //開いてるページが飲食の場合
+            restaurantStore.handleFirestoreCollectionOfFoods();
+          } else if (openingGenreValue === 'shop') {
+            //開いているページがショップの場合
+            shopStore.handleFirestoreCollectionOfShop();
+          } else if (openingGenreValue === 'beauty') {
+            //開いているページが美容の場合
+            beautyStore.handleFirestoreCollectionOfBeauty();
+          } else if (openingGenreValue === 'sightseeing') {
+            //開いているページが観光の場合
+            sightseeingStore.handleFirestoreCollectionOfSightseeing();
+          } else if (openingGenreValue === 'entertainment') {
+            //開いてるページがエンタメの場合
+            entertainmentStore.handleFirestoreCollectionOfEntertainment();
+          } else if (openingGenreValue === 'hospital') {
+            //開いてるページが病院の場合
+            hospitalStore.handleFirestoreCollectionOfHospital();
+          } else if (openingGenreValue === 'other') {
+            //開いてるページがその他の場合
+            othersStore.handleFirestoreCollectionOfOthers();
+          } else {
+            //予期せぬエラーが発生した場合
+            Alert.alert('予期せぬ不具合が発生いたしました。再度お試し下さい');
+          }
+        } else if (this.props.navigation.state.routeName === 'Favorite') {
+          //お気に入りページの際の読み込み処理
+        }
+      });
   }
 
   //お気に入り登録、削除処理
@@ -96,32 +111,39 @@ class Items extends React.Component {
   renderItemBox() {
     const { store } = this.props;
     const currentScreen = this.props.navigation.state.routeName;
-    const items = store.restaurantStore.Items;
-    // await AsyncStorage.getItem('openingGenre')
-    //   .then((openingGenreValue) => {
-    //     if (currentScreen === 'EachShopGenreScreen') {
-    //       if (openingGenreValue === 'food') {
-    //         // this.items = store.restaurantStore.Items;
-    //       } else if (openingGenreValue === 'shop') {
-    //       //ショップのストア読み込み
-    //       } else if (openingGenreValue === 'beauty') {
-    //         //ビューティのストア読み込み
-    //       } else if (openingGenreValue === 'sightseeing') {
-    //         //
-    //       } else if (openingGenreValue === 'entertainment') {
-    //         ///
-    //       } else if (openingGenreValue === 'hospital') {
-    //         ///
-    //       } else if (openingGenreValue === 'other') {
-    //         ///
-    //       } else {
-    //         Alert.alert('予期せぬ不具合が発生いたしました。再度お試し下さい');
-    //       }
-    //     } else if (currentScreen === 'Favorite') {
-    //       ///
-    //     }
-    //   });
-    return items.map((value, index) => (
+    //const items = store.restaurantStore.Items;
+    AsyncStorage.getItem('openingGenre')
+      .then((openingGenreValue) => {
+        if (currentScreen === 'EachShopGenreScreen') {
+          if (openingGenreValue === 'food') {
+            //レストランとストア配列読み込み
+            this.setState({ itemsArray: store.restaurantStore.Items });
+          } else if (openingGenreValue === 'shop') {
+            //ショップのストア配列読み込み
+            this.setState({ itemsArray: store.shopStore.Items });
+          } else if (openingGenreValue === 'beauty') {
+            //ビューティのストア配列読み込み
+            this.setState({ itemsArray: store.beautyStore.Items });
+          } else if (openingGenreValue === 'sightseeing') {
+            //観光ストアの配列読み込み
+            this.setState({ itemsArray: store.sightseeingStore.Items });
+          } else if (openingGenreValue === 'entertainment') {
+            //エンタメストアの配列読み込み
+            this.setState({ itemsArray: store.entertainmentStore.Items });
+          } else if (openingGenreValue === 'hospital') {
+            //病院ストアの配列読み込み
+            this.setState({ itemsArray: store.hospitalStore.Items });
+          } else if (openingGenreValue === 'other') {
+            //その他ストアの配列読み込み
+            this.setState({ itemsArray: store.othersStore.Items });
+          } else {
+            Alert.alert('予期せぬ不具合が発生いたしました。再度お試し下さい');
+          }
+        } else if (currentScreen === 'Favorite') {
+          ///
+        }
+      });
+    return this.state.itemsArray.map((value, index) => (
       <TouchableOpacity
         key={index}
         onPress={() => { this.shopModalHandler(value); }}
@@ -129,7 +151,7 @@ class Items extends React.Component {
         <View style={styles.itemsBox}>
           <View style={styles.itemsImageBox}>
             <Image
-              source={{ uri: value.mainImageUrl }}
+              source={!value.mainImageUrl ? this.state.noImage : { uri: value.mainImageUrl }}
               style={styles.itemsImage}
               PlaceholderContent={<ActivityIndicator />}
             />

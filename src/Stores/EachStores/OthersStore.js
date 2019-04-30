@@ -1,15 +1,15 @@
 import { observable, action } from 'mobx';
 import firebase from 'firebase';
 
-class BeautyStore {
+class OthersStore {
   @observable
   Items = [];
 
   @action.bound
-  handleFirestoreCollectionOfBeauty () {
+  handleFirestoreCollectionOfOthers () {
     const db = firebase.firestore();
     this.Items.length = 0;
-    db.collection('beauties')
+    db.collection('others')
       .get()
       .then((snapshot) => {
         snapshot.forEach((doc) => {
@@ -23,4 +23,4 @@ class BeautyStore {
   }
 }
 
-export default BeautyStore;
+export default OthersStore;
