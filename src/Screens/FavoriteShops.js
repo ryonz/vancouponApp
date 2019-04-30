@@ -2,20 +2,37 @@ import React from 'react';
 import {
   StyleSheet,
   View,
+  AsyncStorage,
 } from 'react-native';
-import { inject, observer } from 'mobx-react/native';
+import { observer, Provider } from 'mobx-react/native';
 import Header from '../Components/Header';
 import EachShopScreenMiddleComponent from '../Components/EachShopScreenMiddleComponent';
+import RootStore from '../Stores/RootStore';
 
-@inject('store')
+const rootStore = new RootStore();
+
 @observer
 class FavoriteShops extends React.Component {
+  async componentDidMount() {
+    try {
+      await AsyncStorage.setItem('openingGenre', 'favorite')
+        .then((openingGenreValue) => {
+          console.log(openingGenreValue);
+        });
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   render() {
+    const { navigation } = this.props;
     return (
-      <View style={styles.container}>
-        <Header />
-        <EachShopScreenMiddleComponent />
-      </View>
+      <Provider store={rootStore}>
+        <View style={styles.container}>
+          <Header>お気に入り</Header>
+          <EachShopScreenMiddleComponent navigation={navigation} />
+        </View>
+      </Provider>
     );
   }
 }

@@ -3,8 +3,10 @@ import {
   StyleSheet,
   View,
   Text,
+  Alert,
   ActivityIndicator,
   ScrollView,
+  AsyncStorage,
   TouchableOpacity,
   Dimensions,
 } from 'react-native';
@@ -21,19 +23,49 @@ class Items extends React.Component {
     };
   }
 
-  async componentWillMount() {
+  async componentDidMount() {
     const { store } = this.props;
     const restaurantStore = store.restaurantStore;
     await restaurantStore.handleFirestoreCollectionOfFoods();
+    console.log(this.props.navigation.state.routeName);
 
+    // await AsyncStorage.getItem('openingGenre')
+    //   .then((openingGenreValue) => {
+    //     console.log(openingGenreValue);
+    //     if (this.props.navigation.state.routeName === 'EachShopGenreScreen') {
+    //       //開いてるページが飲食の場合
+    //       if (openingGenreValue === 'food') {
+    //         restaurantStore.handleFirestoreCollectionOfFoods();
+    //       } else if (openingGenreValue === 'shop') {
+    //       //ショップのストア読み込み
+    //       } else if (openingGenreValue === 'beauty') {
+    //         //ビューティのストア読み込み
+    //       } else if (openingGenreValue === 'sightseeing') {
+    //         //
+    //       } else if (openingGenreValue === 'entertainment') {
+    //         ///
+    //       } else if (openingGenreValue === 'hospital') {
+    //         ///
+    //       } else if (openingGenreValue === 'other') {
+    //         ///
+    //       } else {
+    //         Alert.alert('予期せぬ不具合が発生いたしました。再度お試し下さい');
+    //       }
+    //     } else if (this.props.navigation.state.routeName === 'Favorite') {
+    //       //お気に入りページの際の読み込み処理
+    //     }
+    //   });
   }
 
-  handleLikeButton() {
+  //お気に入り登録、削除処理
+  handleLikeButton(name) {
     const { like } = this.state;
     if (like === false) {
       this.setState({ like: true });
+      AsyncStorage.setItem(`${name}`, '1');
     } else {
       this.setState({ like: false });
+      AsyncStorage.removeItem(`${name}`);
     }
   }
 
@@ -63,9 +95,33 @@ class Items extends React.Component {
 
   renderItemBox() {
     const { store } = this.props;
+    const currentScreen = this.props.navigation.state.routeName;
     const items = store.restaurantStore.Items;
-
-    return items.map((value, index, array) => (
+    // await AsyncStorage.getItem('openingGenre')
+    //   .then((openingGenreValue) => {
+    //     if (currentScreen === 'EachShopGenreScreen') {
+    //       if (openingGenreValue === 'food') {
+    //         // this.items = store.restaurantStore.Items;
+    //       } else if (openingGenreValue === 'shop') {
+    //       //ショップのストア読み込み
+    //       } else if (openingGenreValue === 'beauty') {
+    //         //ビューティのストア読み込み
+    //       } else if (openingGenreValue === 'sightseeing') {
+    //         //
+    //       } else if (openingGenreValue === 'entertainment') {
+    //         ///
+    //       } else if (openingGenreValue === 'hospital') {
+    //         ///
+    //       } else if (openingGenreValue === 'other') {
+    //         ///
+    //       } else {
+    //         Alert.alert('予期せぬ不具合が発生いたしました。再度お試し下さい');
+    //       }
+    //     } else if (currentScreen === 'Favorite') {
+    //       ///
+    //     }
+    //   });
+    return items.map((value, index) => (
       <TouchableOpacity
         key={index}
         onPress={() => { this.shopModalHandler(value); }}
@@ -91,12 +147,15 @@ class Items extends React.Component {
             <Text style={styles.itemsDescription}>
               {value.shortDescription}
             </Text>
+
+            {/* Likeボタン */}
             <TouchableOpacity
               style={styles.likeButtonBox}
-              onPress={this.handleLikeButton.bind(this)}
+              onPress={() => { this.handleLikeButton(value.name); }}
             >
               {this.handleLikeImage()}
             </TouchableOpacity>
+
           </View>
         </View>
 

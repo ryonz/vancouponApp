@@ -1,11 +1,16 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, AsyncStorage } from 'react-native';
 import HomeHeader from '../Elements/Home/HomeHeader';
 import HomeShopList from '../Elements/Home/HomeShopList';
 import HomeAllCouponListButton from '../Elements/Home/HomeAllCouponListButton';
 import HomeAllShopListButton from '../Elements/Home/HomeAllShopListButton';
 
 class Home extends React.Component {
+  //テスト用 リリース時には削除する
+  async componentDidMount() {
+    await AsyncStorage.clear().then(() => { console.log('AsyncStorage all clear'); });
+  }
+
   render() {
     const { navigation } = this.props;
     return (

@@ -5,8 +5,13 @@ import {
   Text,
   TouchableOpacity,
   ScrollView,
+  AsyncStorage,
   Image,
 } from 'react-native';
+import { observer } from 'mobx-react/native';
+import RootStore from '../../Stores/RootStore';
+
+const rootStore = new RootStore();
 
 const listImageSource = {
   food: require('../../../assets/Images/Home/HomeListImageFood.jpg'),
@@ -35,18 +40,53 @@ class HomeShopList extends React.Component {
           onPress={() => {
             if (value.genre === '飲食') {
               navigate('EachShopGenreScreen', 'food');
+              try {
+                AsyncStorage.setItem('openingGenre', 'food');
+              } catch (error) {
+                console.log(error);
+              }
             } else if (value.genre === 'お店') {
               navigate('EachShopGenreScreen', 'shop');
+              try {
+                AsyncStorage.setItem('openingGenre', 'shop');
+              } catch (error) {
+                console.log(error);
+              }
             } else if (value.genre === '美容') {
               navigate('EachShopGenreScreen', 'beauty');
+              try {
+                AsyncStorage.setItem('openingGenre', 'beauty');
+              } catch (error) {
+                console.log(error);
+              }
             } else if (value.genre === '観光') {
               navigate('EachShopGenreScreen', 'sightseeing');
+              try {
+                AsyncStorage.setItem('openingGenre', 'sightseeing');
+              } catch (error) {
+                console.log(error);
+              }
             } else if (value.genre === 'エンタメ') {
               navigate('EachShopGenreScreen', 'entertainment');
+              try {
+                AsyncStorage.setItem('openingGenre', 'entertainment');
+              } catch (error) {
+                console.log(error);
+              }
             } else if (value.genre === '病院') {
               navigate('EachShopGenreScreen', 'hospital');
+              try {
+                AsyncStorage.setItem('openingGenre', 'hospital');
+              } catch (error) {
+                console.log(error);
+              }
             } else if (value.genre === 'その他') {
               navigate('EachShopGenreScreen', 'other');
+              try {
+                AsyncStorage.setItem('openingGenre', 'other');
+              } catch (error) {
+                console.log(error);
+              }
             }
           }}
 

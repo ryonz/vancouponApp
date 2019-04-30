@@ -1,28 +1,41 @@
 import React from 'react';
 import {
+  ActivityIndicator,
   TouchableOpacity,
+  AsyncStorage,
   StyleSheet,
   ScrollView,
   Dimensions,
   View,
   Text,
-  Image,
   Modal,
 } from 'react-native';
-import { Button } from 'react-native-elements';
+import { observer } from 'mobx-react/native';
+import { Button, Image } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Map from './Map';
 import CouponModalOnce from './CouponModals/CouponModalOnce';
 import CouponModalRepetition from './CouponModals/CouponModalRepetition';
 import CouponModalPoint from './CouponModals/CouponModalPoint';
 import QrcodeReader from './QrcodeReader';
+import QRcode from '../Stores/QRcodeStore';
 
+@observer
 class ShopModal extends React.Component {
   state = {
-    QRcodeScannerModalStatus: false,
     detailTimeModal: false,
+    qrcodeReaderModalVisible: false,
+    couponModalStatus: QRcode.couponModalStatus,
+    asyncStoragevalue: '',
   }
 
+  async componentDidMount() {
+    const { value } = this.props.navigation.state.params;
+    const asyncStoragevalue = await AsyncStorage.getItem(`${value.qrcodeUrl}`);
+    this.setState({ asyncStoragevalue });
+  }
+
+  //営業時間ModalのVisibleの変更
   onPressDetailTime() {
     const { detailTimeModal } = this.state;
     if (!detailTimeModal) {
@@ -32,10 +45,17 @@ class ShopModal extends React.Component {
     }
   }
 
-  handleOpenQRcodeScaner = () => {
-    this.setState({ QRcodeScannerModalStatus: true });
+  //QRコードリーダーModalのVisibleの変更
+  handleOpenQrcodeReader() {
+    const { qrcodeReaderModalVisible } = this.state;
+    if (!qrcodeReaderModalVisible) {
+      this.setState({ qrcodeReaderModalVisible: true });
+    } else if (qrcodeReaderModalVisible) {
+      this.setState({ qrcodeReaderModalVisible: false });
+    }
   }
 
+  //お気に入りボタン
   handleLikeButton() {
     return (
       <Image
@@ -45,23 +65,52 @@ class ShopModal extends React.Component {
     );
   }
 
-  handleCouponModal() {
-    return <CouponModalPoint />;
-    // return <CouponModalRepetition />;
-    // return <CouponModalOnce />;
+  //クーポンモーダル表示・非表示処理
+  handleCouponModal(value) {
+    const { couponModalStatus, asyncStoragevalue } = this.state;
+    if (value.couponType === 'once') {
+      if (couponModalStatus === 'true' && asyncStoragevalue !== 'false') {
+        return <CouponModalOnce />;
+      } if (couponModalStatus === 'false' || asyncStoragevalue === 'false') {
+        return;
+      }
+    }
+    if (value.couponType === 'repetition') {
+      return <CouponModalRepetition />;
+    } if (value.couponType === 'point') {
+      return <CouponModalPoint />;
+    }
   }
 
+  //前のスクリーンに戻るボタン
   handleBackButton() {
     this.props.navigation.goBack();
   }
 
-  //曜日ごとに表示する時間帯を変更
+  // QRコードリーダーモーダル
+  renderQrcodeReaderModal(value) {
+    const { qrcodeReaderModalVisible } = this.state;
+    if (qrcodeReaderModalVisible) {
+      return (
+        <Modal
+          visible={qrcodeReaderModalVisible}
+        >
+          <QrcodeReader
+            onPress={() => { this.props.navigation.goBack(); }}
+            qrUrl={value.qrcodeUrl}
+            couponType={value.couponType}
+          />
+        </Modal>
+      );
+    } if (!qrcodeReaderModalVisible) {
+      return null;
+    }
+  }
 
-  renderDetailTime() {
-    const { value } = this.props.navigation.state.params;
+  //曜日ごとに表示する時間帯を変更
+  renderDetailTime(value) {
     const date = new Date();
     const dayOfWeek = date.getDay();
-    console.log(dayOfWeek);
     if (dayOfWeek === 0) {
       return <Text style={styles.detailTextTime}>{value.time0}</Text>;
     } if (dayOfWeek === 1) {
@@ -79,9 +128,9 @@ class ShopModal extends React.Component {
     }
   }
 
-  renderDetailTimeModal() {
+  //営業時間表示用モーダル
+  renderDetailTimeModal(value) {
     const { detailTimeModal } = this.state;
-    const { value } = this.props.navigation.state.params;
     return (
       <Modal
         style={styles.detailTimeModalBox}
@@ -148,14 +197,7 @@ class ShopModal extends React.Component {
 
 
   render() {
-    const {
-      QRcodeScannerModalStatus,
-    } = this.state;
-
     const { value } = this.props.navigation.state.params;
-
-    console.log(value.shopTags);
-    console.log(value.genreTags);
     return (
       <View style={styles.container}>
         <ScrollView style={styles.innerContainer}>
@@ -164,6 +206,7 @@ class ShopModal extends React.Component {
               <Image
                 style={styles.mainImage}
                 source={{ uri: value.mainImageUrl }}
+                PlaceholderContent={<ActivityIndicator />}
               />
             </View>
             <View style={styles.titleBox}>
@@ -206,7 +249,7 @@ class ShopModal extends React.Component {
                   style={styles.iconImage}
                   source={require('../../assets/Images/Icons/clock-circular-outline.png')}
                 />
-                {this.renderDetailTime()}
+                {this.renderDetailTime(value)}
               </TouchableOpacity>
 
               <View style={styles.detailEachBoxUnderBar} />
@@ -281,18 +324,17 @@ class ShopModal extends React.Component {
           </View>
         </ScrollView>
 
+        {/* クーポンモーダル */}
         <TouchableOpacity
           style={styles.couponModalBox}
-          onPress={this.handleOpenQRcodeScaner}
+          onPress={() => { this.handleOpenQrcodeReader(); }}
         >
-          {this.handleCouponModal()}
+          {this.handleCouponModal(value)}
         </TouchableOpacity>
 
-        <Modal
-          visible={QRcodeScannerModalStatus}
-        >
-          <QrcodeReader />
-        </Modal>
+        {/*QRコードリーダーモーダル*/}
+ 
+        {this.renderQrcodeReaderModal(value)}
 
         {/* バックボタン */}
         <TouchableOpacity
@@ -304,7 +346,7 @@ class ShopModal extends React.Component {
           </View>
         </TouchableOpacity>
 
-        {this.renderDetailTimeModal()}
+        {this.renderDetailTimeModal(value)}
 
       </View>
     );

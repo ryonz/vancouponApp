@@ -11,7 +11,6 @@ import Home from './src/Screens/Home';
 import EachShopGenreScreen from './src/Screens/EachShopGenreScreen';
 import FavoriteShops from './src/Screens/FavoriteShops';
 import Help from './src/Screens/Help';
-
 import ShopModal from './src/Components/ShopModal';
 
 require("firebase/firestore");

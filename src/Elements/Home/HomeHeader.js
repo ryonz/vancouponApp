@@ -30,7 +30,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 0.5,
     width: '100%',
-    backgroundColor: 'red',
   },
   homeHeaderImage: {
     height: '100%',

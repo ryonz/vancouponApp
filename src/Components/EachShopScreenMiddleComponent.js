@@ -2,6 +2,7 @@ import React from 'react';
 import {
   StyleSheet,
   View,
+  AsyncStorage,
 } from 'react-native';
 import { inject, observer } from 'mobx-react/native';
 import Items from './Items';
@@ -9,6 +10,7 @@ import Items from './Items';
 @inject('store')
 @observer
 class EachShopScreenMiddleComponent extends React.Component {
+
   render() {
     const { navigation } = this.props;
     return (

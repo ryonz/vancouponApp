@@ -1,6 +1,7 @@
 import React from 'react';
 import {
   StyleSheet,
+  AsyncStorage,
   View,
 } from 'react-native';
 import { observer, Provider } from 'mobx-react/native';
@@ -15,12 +16,14 @@ class EachShopGenreScreen extends React.Component {
   constructor() {
     super();
     this.state = {
-      headerTitle: rootStore.restaurantStore.name,
+      headerTitle: '',
     };
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     const { params } = this.props.navigation.state;
+    //const { store } = this.props;
+    const { headerTitle } = this.state;
     if (params === 'food') {
       this.setState({ headerTitle: '飲食' });
     } else if (params === 'shop') {
