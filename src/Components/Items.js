@@ -29,7 +29,12 @@ class Items extends React.Component {
       allShopsArray: {
         restaurantStoreItems: [],
         shopStoreItems: [],
-      }
+        beautyStoreItems: [],
+        sightseeingStoreItems: [],
+        entertainmentStoreItems: [],
+        hospitalStoreItems: [],
+        othersStoreItems: [],
+      },
     };
   }
 
@@ -47,7 +52,7 @@ class Items extends React.Component {
     await AsyncStorage.getItem('openingGenre')
       .then((openingGenreValue) => {
         console.log(openingGenreValue);
-        this.setState({ openingGenreValue: openingGenreValue });
+        this.setState({ openingGenreValue });
         if (this.props.navigation.state.routeName === 'EachShopGenreScreen') {
           if (openingGenreValue === 'food') {
             //開いてるページが飲食の場合
@@ -138,9 +143,25 @@ class Items extends React.Component {
             //その他ストアの配列読み込み
             this.setState({ itemsArray: store.othersStore.Items });
           } else if (openingGenreValue === 'allCoupon') {
-            //
+            this.setState({ allShopsArray: {
+              restaurantStoreItems: store.restaurantStore.Items,
+              shopStoreItems: store.shopStore.Items,
+              beautyStoreItems: store.beautyStore.Items,
+              sightseeingStoreItems: store.sightseeingStore.Items,
+              entertainmentStoreItems: store.entertainmentStore.Items,
+              hospitalStoreItems: store.hospitalStore.Items,
+              othersStoreItems: store.othersStore.Items,
+            } });
           } else if (openingGenreValue === 'allShop') {
-            this.setState({ allShopsArray: { restaurantStoreItems: store.restaurantStore.Items, shopStoreItems: store.shopStore.Items } });
+            this.setState({ allShopsArray: {
+              restaurantStoreItems: store.restaurantStore.Items,
+              shopStoreItems: store.shopStore.Items,
+              beautyStoreItems: store.beautyStore.Items,
+              sightseeingStoreItems: store.sightseeingStore.Items,
+              entertainmentStoreItems: store.entertainmentStore.Items,
+              hospitalStoreItems: store.hospitalStore.Items,
+              othersStoreItems: store.othersStore.Items,
+            } });
           } else {
             //Alert.alert('予期せぬ不具合が発生いたしました。再度お試し下さい');
           }
@@ -156,7 +177,6 @@ class Items extends React.Component {
         }
       });
   }
-
 
   componentWillUnmounted() {
     this.setState({ itemsArray: null });
@@ -211,13 +231,72 @@ class Items extends React.Component {
 
   //Storeから取得した各ショップデータの配列をレンダリング
   renderItemBox() {
-    console.log(`renderItemBox is ${this.state.openingGenreValue}`);
     if (this.state.openingGenreValue === 'allCoupon') {
-      //
+      const { allShopsArray } = this.state;
+      const arrayConcat = allShopsArray.restaurantStoreItems
+        .concat(
+          allShopsArray.shopStoreItems,
+          allShopsArray.beautyStoreItems,
+          allShopsArray.entertainmentStoreItems,
+          allShopsArray.hospitalStoreItems,
+          allShopsArray.othersStoreItems,
+          allShopsArray.sightseeingStoreItems,
+        );
+      return arrayConcat.map((value, index) => {
+        if (value.couponTag) {
+          return (
+            <TouchableOpacity
+              key={index}
+              onPress={() => { this.shopModalHandler(value); }}
+            >
+              <View style={styles.itemsBox}>
+                <View style={styles.itemsImageBox}>
+                  <Image
+                    source={!value.mainImageUrl ? this.state.noImage : { uri: value.mainImageUrl }}
+                    style={styles.itemsImage}
+                    PlaceholderContent={<ActivityIndicator />}
+                  />
+                </View>
+                <View style={{ flexDirection: 'row' }}>
+                  <Text style={styles.itemsName}>
+                    {value.name}
+                  </Text>
+                  <Text style={styles.itemsTag}>
+                    {value.tag}
+                  </Text>
+                </View>
+    
+                <View style={{ flexDirection: 'row' }}>
+                  <Text style={styles.itemsDescription}>
+                    {value.shortDescription}
+                  </Text>
+    
+                  {/* Likeボタン */}
+                  <TouchableOpacity
+                    style={styles.likeButtonBox}
+                    onPress={() => { this.handleLikeButton(value); }}
+                  >
+                    {this.handleLikeImage(value.name)}
+                  </TouchableOpacity>
+    
+                </View>
+              </View>
+    
+            </TouchableOpacity>
+          );
+        }
+      });
     } else if (this.state.openingGenreValue === 'allShop') {
       const { allShopsArray } = this.state;
-      const arrayConcat = allShopsArray.restaurantStoreItems.concat(allShopsArray.shopStoreItems);
-      console.log(arrayConcat);
+      const arrayConcat = allShopsArray.restaurantStoreItems
+        .concat(
+          allShopsArray.shopStoreItems,
+          allShopsArray.beautyStoreItems,
+          allShopsArray.entertainmentStoreItems,
+          allShopsArray.hospitalStoreItems,
+          allShopsArray.othersStoreItems,
+          allShopsArray.sightseeingStoreItems,
+        );
       return arrayConcat.map((value, index) => (
         <TouchableOpacity
           key={index}
@@ -239,12 +318,12 @@ class Items extends React.Component {
                 {value.tag}
               </Text>
             </View>
-  
+
             <View style={{ flexDirection: 'row' }}>
               <Text style={styles.itemsDescription}>
                 {value.shortDescription}
               </Text>
-  
+
               {/* Likeボタン */}
               <TouchableOpacity
                 style={styles.likeButtonBox}
@@ -252,10 +331,10 @@ class Items extends React.Component {
               >
                 {this.handleLikeImage(value.name)}
               </TouchableOpacity>
-  
+
             </View>
           </View>
-  
+
         </TouchableOpacity>
       ));
     } else if (this.state.openingGenreValue !== 'allCoupon' && 'allShop') {
@@ -280,12 +359,12 @@ class Items extends React.Component {
                 {value.tag}
               </Text>
             </View>
-  
+
             <View style={{ flexDirection: 'row' }}>
               <Text style={styles.itemsDescription}>
                 {value.shortDescription}
               </Text>
-  
+
               {/* Likeボタン */}
               <TouchableOpacity
                 style={styles.likeButtonBox}
@@ -293,10 +372,10 @@ class Items extends React.Component {
               >
                 {this.handleLikeImage(value.name)}
               </TouchableOpacity>
-  
+
             </View>
           </View>
-  
+
         </TouchableOpacity>
       ));
     }
