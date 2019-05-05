@@ -10,8 +10,11 @@ import {
   TouchableOpacity,
   Dimensions,
 } from 'react-native';
+import { SQLite } from 'expo';
 import { inject, observer } from 'mobx-react/native';
 import { Image } from 'react-native-elements';
+
+const db = SQLite.openDatabase('db.db');
 
 @inject('store')
 @observer
@@ -22,6 +25,10 @@ class Items extends React.Component {
       like: false,
       noImage: require('../../assets/Images/Images/noImage.001.jpeg'),
       itemsArray: [],
+      allCouponArray: {
+        restaurantStoreItems: [],
+        shopStoreItems: [],
+      }
     };
   }
 
@@ -34,7 +41,6 @@ class Items extends React.Component {
     const entertainmentStore = store.entertainmentStore;
     const hospitalStore = store.hospitalStore;
     const othersStore = store.othersStore;
-    //await restaurantStore.handleFirestoreCollectionOfFoods();
     console.log(this.props.navigation.state.routeName);
 
     await AsyncStorage.getItem('openingGenre')
@@ -62,62 +68,55 @@ class Items extends React.Component {
           } else if (openingGenreValue === 'other') {
             //開いてるページがその他の場合
             othersStore.handleFirestoreCollectionOfOthers();
+          } else if (openingGenreValue === 'allCoupon') {
+            restaurantStore.handleFirestoreCollectionOfFoods();
+            shopStore.handleFirestoreCollectionOfShop();
+            beautyStore.handleFirestoreCollectionOfBeauty();
+            sightseeingStore.handleFirestoreCollectionOfSightseeing();
+            entertainmentStore.handleFirestoreCollectionOfEntertainment();
+            hospitalStore.handleFirestoreCollectionOfHospital();
+            othersStore.handleFirestoreCollectionOfOthers();
+          } else if (openingGenreValue === 'allShop') {
+            restaurantStore.handleFirestoreCollectionOfFoods();
+            shopStore.handleFirestoreCollectionOfShop();
+            beautyStore.handleFirestoreCollectionOfBeauty();
+            sightseeingStore.handleFirestoreCollectionOfSightseeing();
+            entertainmentStore.handleFirestoreCollectionOfEntertainment();
+            hospitalStore.handleFirestoreCollectionOfHospital();
+            othersStore.handleFirestoreCollectionOfOthers();
           } else {
             //予期せぬエラーが発生した場合
             Alert.alert('予期せぬ不具合が発生いたしました。再度お試し下さい');
           }
         } else if (this.props.navigation.state.routeName === 'Favorite') {
-          //お気に入りページの際の読み込み処理
+          restaurantStore.handleFirestoreCollectionOfFoods();
+          shopStore.handleFirestoreCollectionOfShop();
+          beautyStore.handleFirestoreCollectionOfBeauty();
+          sightseeingStore.handleFirestoreCollectionOfSightseeing();
+          entertainmentStore.handleFirestoreCollectionOfEntertainment();
+          hospitalStore.handleFirestoreCollectionOfHospital();
+          othersStore.handleFirestoreCollectionOfOthers();
         }
       });
-  }
-
-  //お気に入り登録、削除処理
-  handleLikeButton(name) {
-    const { like } = this.state;
-    if (like === false) {
-      this.setState({ like: true });
-      AsyncStorage.setItem(`${name}`, '1');
-    } else {
-      this.setState({ like: false });
-      AsyncStorage.removeItem(`${name}`);
-    }
-  }
-
-  handleLikeImage() {
-    const { like } = this.state;
-    if (like === true) {
-      return (
-        <Image
-          source={require('../../assets/Images/Icons/likeRed.png')}
-          style={styles.likeButton}
-        />
+    //SQLiteでTable「favoriteItems」作成,カラムにはIDとValueを設定
+    db.transaction((tx) => {
+      tx.executeSql(
+        `create table if not exists favoriteItems(id integer primary key not null);`,
+        null,
+        () => { console.log('suc'); },
+        () => { console.log('error'); },
       );
-    }
-    return (
-      <Image
-        source={require('../../assets/Images/Icons/like.png')}
-        style={styles.likeButton}
-      />
-    );
-  }
-
-  shopModalHandler(value) {
-    //console.log(value);
-    const { navigate } = this.props.navigation;
-    navigate('ShopModal', { value });
-  }
-
-  renderItemBox() {
-    const { store } = this.props;
+    });
+    //現在のスクリーンの判定と、それに応じたストアの配列へのSET
     const currentScreen = this.props.navigation.state.routeName;
-    //const items = store.restaurantStore.Items;
     AsyncStorage.getItem('openingGenre')
       .then((openingGenreValue) => {
         if (currentScreen === 'EachShopGenreScreen') {
           if (openingGenreValue === 'food') {
             //レストランとストア配列読み込み
+            console.log(this.state.itemsArray, 'itemsArray');
             this.setState({ itemsArray: store.restaurantStore.Items });
+            //items = store.restaurantStore.Items;
           } else if (openingGenreValue === 'shop') {
             //ショップのストア配列読み込み
             this.setState({ itemsArray: store.shopStore.Items });
@@ -136,14 +135,81 @@ class Items extends React.Component {
           } else if (openingGenreValue === 'other') {
             //その他ストアの配列読み込み
             this.setState({ itemsArray: store.othersStore.Items });
+          } else if (openingGenreValue === 'allCoupon') {
+            //
+          } else if (openingGenreValue === 'allShop') {
+            this.setState({ allCouponArray: { restaurantStoreItems: store.restaurantStore.Items, shopStoreItems: store.shopStore.Items } });
           } else {
-            Alert.alert('予期せぬ不具合が発生いたしました。再度お試し下さい');
+            //Alert.alert('予期せぬ不具合が発生いたしました。再度お試し下さい');
           }
         } else if (currentScreen === 'Favorite') {
-          ///
+          db.transaction((tx) => {
+            tx.executeSql(
+              `select * from favoriteItems;`,
+              null,
+              () => {},
+              () => { console.log('error'); },
+            );
+          });
         }
       });
-    return this.state.itemsArray.map((value, index) => (
+  }
+
+
+  componentWillUnmounted() {
+    this.setState({ itemsArray: null });
+  }
+
+  //お気に入り登録、削除処理
+  handleLikeButton(value, array) {
+    //SQliteへのお気に入りIDの追加と削除
+    db.transaction((tx) => {
+      tx.executeSql(
+        `insert into favoriteItems (id) values (${value.id});`,
+        null,
+        () => { console.log('insert suc'); },
+        () => {
+          tx.executeSql(
+            `delete from favoriteItems where id = ${value.id}`,
+            null,
+            () => { console.log('delete id suc'); },
+            (error) => { console.log(error); },
+          );
+        },
+      );
+    });
+  }
+
+  //
+  handleLikeImage(name) {
+    const checkFavorite = AsyncStorage.getItem(`${name}.favorite`);
+    if (checkFavorite === 'true') {
+      return (
+        <Image
+          source={require('../../assets/Images/Icons/likeRed.png')}
+          style={styles.likeButton}
+        />
+      );
+    }
+    if (checkFavorite !== 'true') {
+      return (
+        <Image
+          source={require('../../assets/Images/Icons/like.png')}
+          style={styles.likeButton}
+        />
+      );
+    }
+  }
+
+  shopModalHandler(value) {
+    //console.log(value);
+    const { navigate } = this.props.navigation;
+    navigate('ShopModal', { value });
+  }
+
+  renderItemBox() {
+    //Storeから取得した各ショップデータの配列をレンダリング
+    return this.state.allCouponArray.shopStoreItems.map((value, index) => (
       <TouchableOpacity
         key={index}
         onPress={() => { this.shopModalHandler(value); }}
@@ -173,9 +239,9 @@ class Items extends React.Component {
             {/* Likeボタン */}
             <TouchableOpacity
               style={styles.likeButtonBox}
-              onPress={() => { this.handleLikeButton(value.name); }}
+              onPress={() => { this.handleLikeButton(value); }}
             >
-              {this.handleLikeImage()}
+              {this.handleLikeImage(value.name)}
             </TouchableOpacity>
 
           </View>
@@ -187,10 +253,6 @@ class Items extends React.Component {
 
 
   render() {
-    //const { modalVisible } = this.state;
-    // if (this.props.store.restaurantStore.Items.length  ) {
-    //   return <View/>
-    // }
     return (
       <View style={styles.container}>
         <ScrollView
@@ -265,3 +327,65 @@ const styles = StyleSheet.create({
 });
 
 export default Items;
+
+
+// id,
+// name,
+// catchCopy,
+// couponType,
+// couponTag,
+// genreTag,
+// shortDescription,
+// longDescription,
+// address,
+// latitude,
+// longitude,
+// time0,
+// time1,
+// time2,
+// time3,
+// time4,
+// time5,
+// time6,
+// facebook,
+// instagram,
+// twitter,
+// mainImageUrl,
+// note1,
+// note2,
+// note3,
+// note4,
+// phoneNumber,
+// qrcodeUrl,
+// webPage
+// )
+// values (
+// ${value.id},
+// ${value.name},
+// ${value.catchCopy},
+// ${value.couponType},
+// ${value.couponTag},
+// ${value.genreTag},
+// ${value.shortDescription},
+// ${value.longDescription},
+// ${value.address},
+// ${value.latitude},
+// ${value.longitude},
+// ${value.time0},
+// ${value.time1},
+// ${value.time2},
+// ${value.time3},
+// ${value.time4},
+// ${value.time5},
+// ${value.time6},
+// ${value.facebook},
+// ${value.instagram},
+// ${value.twitter},
+// ${value.mainImageUrl},
+// ${value.note1},
+// ${value.note2},
+// ${value.note3},
+// ${value.note4},
+// ${value.phoneNumber},
+// ${value.qrcodeUrl},
+// ${value.webPage}

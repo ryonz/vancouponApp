@@ -4,13 +4,22 @@ import {
   View,
   Text,
   TouchableOpacity,
+  AsyncStorage,
 } from 'react-native';
 
 class HomeAllShopListButton extends React.Component {
-  handleOnPressNavigation() {
+  async handleOnPressNavigation() {
     const { navigation } = this.props;
     const { params } = navigation.state;
-    navigation.navigate('EachShopGenreScreen', 'allShop');
+    try {
+      await AsyncStorage.setItem('openingGenre', 'allShop')
+        .then((openingGenreValue) => {
+          console.log(openingGenreValue);
+          navigation.navigate('EachShopGenreScreen', 'allShop');
+        });
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   renderButton() {

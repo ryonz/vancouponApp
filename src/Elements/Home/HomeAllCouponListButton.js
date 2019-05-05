@@ -4,13 +4,22 @@ import {
   View,
   Text,
   TouchableOpacity,
+  AsyncStorage,
 } from 'react-native';
 
 class HomeAllCouponListButton extends React.Component {
-  handleOnPressNavigation() {
+  async handleOnPressNavigation() {
     const { navigation } = this.props;
     const { params } = navigation.state;
-    navigation.navigate('EachShopGenreScreen', 'allCoupon');
+    try {
+      await AsyncStorage.setItem('openingGenre', 'allCoupon')
+        .then((openingGenreValue) => {
+          console.log(openingGenreValue);
+          navigation.navigate('EachShopGenreScreen', 'allCoupon');
+        });
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   renderButton() {

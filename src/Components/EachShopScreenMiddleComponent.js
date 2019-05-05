@@ -2,7 +2,6 @@ import React from 'react';
 import {
   StyleSheet,
   View,
-  AsyncStorage,
 } from 'react-native';
 import { inject, observer } from 'mobx-react/native';
 import Items from './Items';
