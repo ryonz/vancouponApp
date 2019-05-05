@@ -24,8 +24,9 @@ class Items extends React.Component {
     this.state = {
       like: false,
       noImage: require('../../assets/Images/Images/noImage.001.jpeg'),
+      openingGenreValue: '',
       itemsArray: [],
-      allCouponArray: {
+      allShopsArray: {
         restaurantStoreItems: [],
         shopStoreItems: [],
       }
@@ -46,6 +47,7 @@ class Items extends React.Component {
     await AsyncStorage.getItem('openingGenre')
       .then((openingGenreValue) => {
         console.log(openingGenreValue);
+        this.setState({ openingGenreValue: openingGenreValue });
         if (this.props.navigation.state.routeName === 'EachShopGenreScreen') {
           if (openingGenreValue === 'food') {
             //開いてるページが飲食の場合
@@ -138,7 +140,7 @@ class Items extends React.Component {
           } else if (openingGenreValue === 'allCoupon') {
             //
           } else if (openingGenreValue === 'allShop') {
-            this.setState({ allCouponArray: { restaurantStoreItems: store.restaurantStore.Items, shopStoreItems: store.shopStore.Items } });
+            this.setState({ allShopsArray: { restaurantStoreItems: store.restaurantStore.Items, shopStoreItems: store.shopStore.Items } });
           } else {
             //Alert.alert('予期せぬ不具合が発生いたしました。再度お試し下さい');
           }
@@ -207,50 +209,98 @@ class Items extends React.Component {
     navigate('ShopModal', { value });
   }
 
+  //Storeから取得した各ショップデータの配列をレンダリング
   renderItemBox() {
-    //Storeから取得した各ショップデータの配列をレンダリング
-    return this.state.allCouponArray.shopStoreItems.map((value, index) => (
-      <TouchableOpacity
-        key={index}
-        onPress={() => { this.shopModalHandler(value); }}
-      >
-        <View style={styles.itemsBox}>
-          <View style={styles.itemsImageBox}>
-            <Image
-              source={!value.mainImageUrl ? this.state.noImage : { uri: value.mainImageUrl }}
-              style={styles.itemsImage}
-              PlaceholderContent={<ActivityIndicator />}
-            />
+    console.log(`renderItemBox is ${this.state.openingGenreValue}`);
+    if (this.state.openingGenreValue === 'allCoupon') {
+      //
+    } else if (this.state.openingGenreValue === 'allShop') {
+      const { allShopsArray } = this.state;
+      const arrayConcat = allShopsArray.restaurantStoreItems.concat(allShopsArray.shopStoreItems);
+      console.log(arrayConcat);
+      return arrayConcat.map((value, index) => (
+        <TouchableOpacity
+          key={index}
+          onPress={() => { this.shopModalHandler(value); }}
+        >
+          <View style={styles.itemsBox}>
+            <View style={styles.itemsImageBox}>
+              <Image
+                source={!value.mainImageUrl ? this.state.noImage : { uri: value.mainImageUrl }}
+                style={styles.itemsImage}
+                PlaceholderContent={<ActivityIndicator />}
+              />
+            </View>
+            <View style={{ flexDirection: 'row' }}>
+              <Text style={styles.itemsName}>
+                {value.name}
+              </Text>
+              <Text style={styles.itemsTag}>
+                {value.tag}
+              </Text>
+            </View>
+  
+            <View style={{ flexDirection: 'row' }}>
+              <Text style={styles.itemsDescription}>
+                {value.shortDescription}
+              </Text>
+  
+              {/* Likeボタン */}
+              <TouchableOpacity
+                style={styles.likeButtonBox}
+                onPress={() => { this.handleLikeButton(value); }}
+              >
+                {this.handleLikeImage(value.name)}
+              </TouchableOpacity>
+  
+            </View>
           </View>
-          <View style={{ flexDirection: 'row' }}>
-            <Text style={styles.itemsName}>
-              {value.name}
-            </Text>
-            <Text style={styles.itemsTag}>
-              {value.tag}
-            </Text>
+  
+        </TouchableOpacity>
+      ));
+    } else if (this.state.openingGenreValue !== 'allCoupon' && 'allShop') {
+      return this.state.itemsArray.map((value, index) => (
+        <TouchableOpacity
+          key={index}
+          onPress={() => { this.shopModalHandler(value); }}
+        >
+          <View style={styles.itemsBox}>
+            <View style={styles.itemsImageBox}>
+              <Image
+                source={!value.mainImageUrl ? this.state.noImage : { uri: value.mainImageUrl }}
+                style={styles.itemsImage}
+                PlaceholderContent={<ActivityIndicator />}
+              />
+            </View>
+            <View style={{ flexDirection: 'row' }}>
+              <Text style={styles.itemsName}>
+                {value.name}
+              </Text>
+              <Text style={styles.itemsTag}>
+                {value.tag}
+              </Text>
+            </View>
+  
+            <View style={{ flexDirection: 'row' }}>
+              <Text style={styles.itemsDescription}>
+                {value.shortDescription}
+              </Text>
+  
+              {/* Likeボタン */}
+              <TouchableOpacity
+                style={styles.likeButtonBox}
+                onPress={() => { this.handleLikeButton(value); }}
+              >
+                {this.handleLikeImage(value.name)}
+              </TouchableOpacity>
+  
+            </View>
           </View>
-
-          <View style={{ flexDirection: 'row' }}>
-            <Text style={styles.itemsDescription}>
-              {value.shortDescription}
-            </Text>
-
-            {/* Likeボタン */}
-            <TouchableOpacity
-              style={styles.likeButtonBox}
-              onPress={() => { this.handleLikeButton(value); }}
-            >
-              {this.handleLikeImage(value.name)}
-            </TouchableOpacity>
-
-          </View>
-        </View>
-
-      </TouchableOpacity>
-    ));
+  
+        </TouchableOpacity>
+      ));
+    }
   }
-
 
   render() {
     return (
