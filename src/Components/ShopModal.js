@@ -78,7 +78,7 @@ class ShopModal extends React.Component {
     if (value.couponType === 'repetition') {
       return <CouponModalRepetition couponMessage={value.couponMessage} />;
     } if (value.couponType === 'point') {
-      return <CouponModalPoint couponMessage={value.couponMessage} />;
+      return <CouponModalPoint couponMessage={value.couponMessage} shopName={value.name} />;
     }
   }
 
@@ -99,6 +99,7 @@ class ShopModal extends React.Component {
             onPress={() => { this.props.navigation.goBack(); }}
             qrUrl={value.qrcodeUrl}
             couponType={value.couponType}
+            shopName={value.name}
           />
         </Modal>
       );
@@ -165,30 +166,55 @@ class ShopModal extends React.Component {
     if (value.genreTag && value.couponTag) {
       return (
         <View style={styles.titleBoxFirstLine}>
-          <Text style={styles.shopTitle}>{value.name}</Text>
+          {/* お店の名前 */}
+          <Text style={styles.shopTitle}>
+            {value.name}
+          </Text>
+
+          {/* ジャンルタグ */}
           <View style={styles.shopTagsBackground}>
-            <Text style={styles.shopTags}>{value.genreTag}</Text>
+            <Text style={styles.shopTags}>
+              {value.genreTag}
+            </Text>
           </View>
+
+          {/* クーポンタグ */}
           <View style={styles.shopTagsBackground}>
-            <Text style={styles.shopTags}>{value.couponTag}</Text>
+            <Text style={styles.shopTags}>
+              {value.couponTag}
+            </Text>
           </View>
         </View>
       );
     } if (value.genreTag && !value.couponTag) {
       return (
         <View style={styles.titleBoxFirstLine}>
-          <Text style={styles.shopTitle}>{value.name}</Text>
+          {/* お店の名前 */}
+          <Text style={styles.shopTitle}>
+            {value.name}
+          </Text>
+
+          {/* ジャンルタグ */}
           <View style={styles.shopTagsBackground}>
-            <Text style={styles.shopTags}>{value.genreTag}</Text>
+            <Text style={styles.shopTags}>
+              {value.genreTag}
+            </Text>
           </View>
         </View>
       );
     } if (!value.genreTag && value.couponTag) {
       return (
         <View style={styles.titleBoxFirstLine}>
-          <Text style={styles.shopTitle}>{value.name}</Text>
+          {/* お店の名前 */}
+          <Text style={styles.shopTitle}>
+            {value.name}
+          </Text>
+
+          {/* ジャンルタグ */}
           <View style={styles.shopTagsBackground}>
-            <Text style={styles.shopTags}>{value.couponTag}</Text>
+            <Text style={styles.shopTags}>
+              {value.couponTag}
+            </Text>
           </View>
         </View>
       );

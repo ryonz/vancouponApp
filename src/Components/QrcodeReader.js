@@ -43,6 +43,7 @@ class QrcodeReader extends React.Component {
 
   //QRコードがショップに対応したものかどうか判定
   async checkQrUrl(data) {
+    const { shopName } = this.props;
     // クーポンタイプが１回きりの場合
     if (this.state.couponType === 'once') {
       try {
@@ -74,6 +75,17 @@ class QrcodeReader extends React.Component {
     if (this.state.couponType === 'point') {
       if (data === this.state.UniqueQrUrl) {
         Alert.alert('クーポンを使用しました');
+        AsyncStorage.getItem(`${shopName}.currentPoint`)
+          .then((currentPoint) => {
+            if (!currentPoint) {
+              const point = 1;
+              AsyncStorage.setItem(`${shopName}.currentPoint`, `${point}`);
+            } else {
+              let point = Number(currentPoint);
+              const Point = ++point;
+              AsyncStorage.setItem(`${shopName}.currentPoint`, `${Point}`);
+            }
+          });
       } else if (data !== this.state.UniqueQrUrl) {
         Alert.alert('QRコードが違います');
       } else {

@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
   },
   couponTextRightLine1: {
     fontSize: 17,
-    fontWeight: '500',
+    fontWeight: '900',
     marginTop: 53,
   },
 });

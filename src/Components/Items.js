@@ -442,6 +442,7 @@ const styles = StyleSheet.create({
   },
   itemsNameBox: {
     width: '70%',
+    height: '90%',
   },
   itemsName: {
     fontSize: 16,

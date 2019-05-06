@@ -1,19 +1,41 @@
 import React from 'react';
 import {
   StyleSheet,
+  AsyncStorage,
   View,
   Text,
 } from 'react-native';
 
 class CouponModalPoint extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      currentPoint: '0',
+    };
+  }
+
+  async componentDidMount() {
+    const { shopName } = this.props;
+    await AsyncStorage.getItem(`${shopName}.currentPoint`)
+      .then((currentPoint) => {
+        if (currentPoint) {
+          this.setState({ currentPoint });
+        }
+      });
+  }
+
   render() {
     return (
       <View style={styles.container}>
         <View style={styles.rightSideColorBar} />
         <View style={styles.couponRightSideBox}>
           <View style={styles.rightSideTextBox}>
-            <Text style={styles.couponTextLeftLine1}>現在のポイント</Text>
-            <Text style={styles.couponTextLeftLine2}>1pt</Text>
+            <Text style={styles.couponTextLeftLine1}>
+              現在のポイント
+            </Text>
+            <Text style={styles.couponTextLeftLine2}>
+              {`${this.state.currentPoint}pt`}
+            </Text>
           </View>
         </View>
 
