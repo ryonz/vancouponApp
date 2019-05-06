@@ -27,6 +27,7 @@ class ShopModal extends React.Component {
     qrcodeReaderModalVisible: false,
     couponModalStatus: QRcode.couponModalStatus,
     asyncStoragevalue: '',
+    noImage: require('../../assets/Images/Images/noImage.001.jpeg'),
   }
 
   async componentDidMount() {
@@ -231,7 +232,7 @@ class ShopModal extends React.Component {
             <View style={styles.mainImageBox}>
               <Image
                 style={styles.mainImage}
-                source={{ uri: value.mainImageUrl }}
+                source={!value.mainImageUrl ? this.state.noImage : { uri: value.mainImageUrl }}
                 PlaceholderContent={<ActivityIndicator />}
               />
             </View>

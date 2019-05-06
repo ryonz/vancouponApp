@@ -4,36 +4,43 @@ import {
   View,
   Text,
   ScrollView,
-  Dimensions,
 } from 'react-native';
-import Modal from 'react-native-modalbox';
-
-const HEIGHT = Dimensions.get('window').height;
 
 class HelpModalAboutThisApp extends React.Component {
   render() {
     const {
-      isVisible,
-      onBackdropPress,
       children,
     } = this.props;
 
     return (
       <View style={styles.container}>
-        <Modal
-          isVisible={isVisible}
-          onBackdropPress={onBackdropPress}
-          style={styles.generalModalBox}
-        >
-          <View style={styles.helpModalHeaderTitleBox}>
-            <Text style={styles.helpModalHeaderTitle}>
-              {children}
+
+        <View style={styles.helpModalHeaderTitleBox}>
+          <Text style={styles.helpModalHeaderTitle}>
+            {children}
+          </Text>
+        </View>
+        <ScrollView style={styles.generalModalViewBox}>
+          <View style={styles.modalTextBox}>
+            <Text style={styles.modalText}>
+              バンクーバー最大規模の留学エージェントであるJPCANADAが運営するクーポンアプリ「Vancoupon（バンクーポン）」です。
+              {"\n"}
+              {"\n"}
+              バンクーバーに滞在している方々が少しでもお得にバンクーバーを楽しめるようにとの思いで運営されています。
+              {"\n"}
+              {"\n"}
+              お店の情報なども随時追加予定ですので、是非楽しみにしていて下さい。
+              {"\n"}
+              {"\n"}
+              {"\n"}
+              {"\n"}
+              {"\n"}
+              {"\n"}
+              JPCANDA留学センター
             </Text>
           </View>
-          <ScrollView style={styles.generalModalViewBox}>
-            <Text>aaaa</Text>
-          </ScrollView>
-        </Modal>
+        </ScrollView>
+
       </View>
     );
   }
@@ -42,25 +49,23 @@ class HelpModalAboutThisApp extends React.Component {
 const styles = StyleSheet.create({
   container: {
     width: '100%',
+    //height: '80%',
   },
-  generalModalBox: {
-    flex: 1,
-    backgroundColor: '#F9F9F9',
-    marginTop: HEIGHT * 0.07,
-    marginBottom: HEIGHT * 0.07,
-    borderRadius: 15,
-  },
-  generalModalViewBox: {
+  modalTextBox: {
+    alignItems: 'center',
     width: '100%',
-    paddingTop: '5%',
-    paddingLeft: '5%',
-    paddingRight: '5%',
+    marginTop: 20,
+    marginBottom: 100,
+    paddingBottom: 20,
+  },
+  modalText: {
+    width: '80%',
   },
   helpModalHeaderTitleBox: {
     width: '100%',
-    height: '5%',
+    height: 50,
     backgroundColor: '#F9F9F9',
-    borderBottomWidth: 0.2,
+    borderBottomWidth: 0.5,
     borderTopRightRadius: 15,
     borderTopLeftRadius: 15,
     alignItems: 'center',

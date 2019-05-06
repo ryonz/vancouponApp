@@ -4,13 +4,31 @@ import {
   StyleSheet,
   Text,
   Dimensions,
+  TouchableOpacity,
 } from 'react-native';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 class Header extends React.Component {
+  //前のスクリーンに戻るボタン
+  handleBackButton() {
+    this.props.navigation.goBack();
+  }
+
   render() {
     const { children } = this.props;
     return (
       <View style={styles.container}>
+
+        {/* バックボタン */}
+        <TouchableOpacity
+          style={styles.backButtonBox}
+          onPress={() => { this.handleBackButton(); }}
+        >
+          <View style={styles.backButton}>
+            <Icon name="chevron-left" style={styles.backButtonIcon} />
+          </View>
+        </TouchableOpacity>
+
         <Text style={styles.headerText}>
           {children}
         </Text>
@@ -38,6 +56,24 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: '900',
     paddingTop: '13%',
+  },
+  backButtonBox: {
+    position: 'absolute',
+    top: 40,
+    left: 15,
+    width: 50,
+    height: 50,
+  },
+  backButton: {
+    width: 50,
+    height: 50,
+    borderRadius: 50,
+  },
+  backButtonIcon: {
+    fontSize: 23,
+    color: '#fff',
+    marginTop: 15,
+    marginLeft: 14,
   },
 });
 

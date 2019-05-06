@@ -51,7 +51,7 @@ class EachShopGenreScreen extends React.Component {
     return (
       <Provider store={rootStore}>
         <View style={styles.container}>
-          <Header>{headerTitle}</Header>
+          <Header navigation={navigation}>{headerTitle}</Header>
           <EachShopScreenMiddleComponent navigation={navigation} />
         </View>
       </Provider>

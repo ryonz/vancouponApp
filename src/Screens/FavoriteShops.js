@@ -29,7 +29,7 @@ class FavoriteShops extends React.Component {
     return (
       <Provider store={rootStore}>
         <View style={styles.container}>
-          <Header>お気に入り</Header>
+          <Header navigation={navigation}>お気に入り</Header>
           <EachShopScreenMiddleComponent navigation={navigation} />
         </View>
       </Provider>

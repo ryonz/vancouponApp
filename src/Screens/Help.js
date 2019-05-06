@@ -4,8 +4,10 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
+  Dimensions,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import Modal from 'react-native-modalbox';
 import { expo } from '../../app.json';
 import Header from '../Components/Header';
 import HelpModalAboutThisApp from '../Elements/Help/HelpModalAboutThisApp';
@@ -18,6 +20,8 @@ const HelpLists = [
   { name: '利用規約', navigationLink: '' },
   { name: 'アプリのバージョン', navigationLink: '' },
 ];
+
+const HEIGHT = Dimensions.get('window').height;
 
 class Help extends React.Component {
   state = {
@@ -66,31 +70,50 @@ class Help extends React.Component {
 
   render() {
     const { modalVisible0, modalVisible1, modalVisible2 } = this.state;
+    const { navigation } = this.props;
     return (
       <View style={styles.container}>
-        <Header>ヘルプ</Header>
+        <Header navigation={navigation}>
+          ヘルプ
+        </Header>
         {this.renderHelpLists()}
-        <HelpModalAboutThisApp
-          isVisible={modalVisible0}
+
+        <Modal
+          style={styles.generalModalBox}
+          isOpen={modalVisible0}
+          swipeArea={100}
           onBackdropPress={() => { this.setState({ modalVisible0: false }); }}
+          onClosed={() => { this.setState({ modalVisible0: false }); }}
         >
-          {HelpLists[0].name}
-        </HelpModalAboutThisApp>
+          <HelpModalAboutThisApp>
+            {HelpLists[0].name}
+          </HelpModalAboutThisApp>
+        </Modal>
 
-        <HelpModalAboutJpcanada
-          isVisible={modalVisible1}
+        <Modal
+          style={styles.generalModalBox}
+          isOpen={modalVisible1}
+          swipeArea={100}
           onBackdropPress={() => { this.setState({ modalVisible1: false }); }}
-        >
-          {HelpLists[1].name}
-        </HelpModalAboutJpcanada>
+          onClosed={() => { this.setState({ modalVisible1: false }); }}
 
-        <HelpModalAboutRegulation
-          isVisible={modalVisible2}
+        >
+          <HelpModalAboutJpcanada>
+            {HelpLists[1].name}
+          </HelpModalAboutJpcanada>
+        </Modal>
+
+        <Modal
+          style={styles.generalModalBox}
+          isOpen={modalVisible2}
+          swipeArea={100}
           onBackdropPress={() => { this.setState({ modalVisible2: false }); }}
+          onClosed={() => { this.setState({ modalVisible2: false }); }}
         >
-          {HelpLists[2].name}
-        </HelpModalAboutRegulation>
-
+          <HelpModalAboutRegulation>
+            {HelpLists[2].name}
+          </HelpModalAboutRegulation>
+        </Modal>
       </View>
     );
   }
@@ -125,6 +148,12 @@ const styles = StyleSheet.create({
     right: '50%',
     fontSize: 15,
     color: '#707070',
+  },
+  generalModalBox: {
+    flex: 1,
+    backgroundColor: '#F9F9F9',
+    marginTop: HEIGHT * 0.07,
+    borderRadius: 15,
   },
 });
 
