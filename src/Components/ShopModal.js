@@ -70,15 +70,15 @@ class ShopModal extends React.Component {
     const { couponModalStatus, asyncStoragevalue } = this.state;
     if (value.couponType === 'once') {
       if (couponModalStatus === 'true' && asyncStoragevalue !== 'false') {
-        return <CouponModalOnce />;
+        return <CouponModalOnce couponMessage={value.couponMessage} />;
       } if (couponModalStatus === 'false' || asyncStoragevalue === 'false') {
         return;
       }
     }
     if (value.couponType === 'repetition') {
-      return <CouponModalRepetition />;
+      return <CouponModalRepetition couponMessage={value.couponMessage} />;
     } if (value.couponType === 'point') {
-      return <CouponModalPoint />;
+      return <CouponModalPoint couponMessage={value.couponMessage} />;
     }
   }
 
@@ -267,8 +267,6 @@ class ShopModal extends React.Component {
                 style={styles.mapContainer}
                 latitude={value.latitude}
                 longitude={value.longitude}
-                // latitudeDelta={value.map.latitudeDelta}
-                // longitudeDelta={value.map.longitudeDelta}
               />
 
               <View style={styles.addressContainerBox}>
@@ -412,6 +410,7 @@ const styles = StyleSheet.create({
     borderWidth: 0.1,
     borderRadius: 5,
     marginLeft: 7,
+    overflow: 'hidden',
   },
   shopTags: {
     color: '#fff',

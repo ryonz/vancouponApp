@@ -25,7 +25,9 @@ class Items extends React.Component {
       like: false,
       noImage: require('../../assets/Images/Images/noImage.001.jpeg'),
       openingGenreValue: '',
+
       itemsArray: [],
+
       allShopsArray: {
         restaurantStoreItems: [],
         shopStoreItems: [],
@@ -35,6 +37,8 @@ class Items extends React.Component {
         hospitalStoreItems: [],
         othersStoreItems: [],
       },
+
+      favoriteIDs: [],
     };
   }
 
@@ -47,11 +51,11 @@ class Items extends React.Component {
     const entertainmentStore = store.entertainmentStore;
     const hospitalStore = store.hospitalStore;
     const othersStore = store.othersStore;
-    console.log(this.props.navigation.state.routeName);
+    //console.log(this.props.navigation.state.routeName);
 
     await AsyncStorage.getItem('openingGenre')
       .then((openingGenreValue) => {
-        console.log(openingGenreValue);
+        console.log(`${openingGenreValue} AsyncStorage`);
         this.setState({ openingGenreValue });
         if (this.props.navigation.state.routeName === 'EachShopGenreScreen') {
           if (openingGenreValue === 'food') {
@@ -121,7 +125,6 @@ class Items extends React.Component {
         if (currentScreen === 'EachShopGenreScreen') {
           if (openingGenreValue === 'food') {
             //レストランとストア配列読み込み
-            console.log(this.state.itemsArray, 'itemsArray');
             this.setState({ itemsArray: store.restaurantStore.Items });
             //items = store.restaurantStore.Items;
           } else if (openingGenreValue === 'shop') {
@@ -166,14 +169,15 @@ class Items extends React.Component {
             //Alert.alert('予期せぬ不具合が発生いたしました。再度お試し下さい');
           }
         } else if (currentScreen === 'Favorite') {
-          db.transaction((tx) => {
-            tx.executeSql(
-              `select * from favoriteItems;`,
-              null,
-              () => {},
-              () => { console.log('error'); },
-            );
-          });
+          this.setState({ allShopsArray: {
+            restaurantStoreItems: store.restaurantStore.Items,
+            shopStoreItems: store.shopStore.Items,
+            beautyStoreItems: store.beautyStore.Items,
+            sightseeingStoreItems: store.sightseeingStore.Items,
+            entertainmentStoreItems: store.entertainmentStore.Items,
+            hospitalStoreItems: store.hospitalStore.Items,
+            othersStoreItems: store.othersStore.Items,
+          } });
         }
       });
   }
@@ -231,46 +235,113 @@ class Items extends React.Component {
 
   //Storeから取得した各ショップデータの配列をレンダリング
   renderItemBox() {
-    if (this.state.openingGenreValue === 'allCoupon') {
-      const { allShopsArray } = this.state;
-      const arrayConcat = allShopsArray.restaurantStoreItems
-        .concat(
-          allShopsArray.shopStoreItems,
-          allShopsArray.beautyStoreItems,
-          allShopsArray.entertainmentStoreItems,
-          allShopsArray.hospitalStoreItems,
-          allShopsArray.othersStoreItems,
-          allShopsArray.sightseeingStoreItems,
-        );
-      return arrayConcat.map((value, index) => {
-        if (value.couponTag) {
-          return (
-            <TouchableOpacity
-              key={index}
-              onPress={() => { this.shopModalHandler(value); }}
-            >
-              <View style={styles.itemsBox}>
-                <View style={styles.itemsImageBox}>
-                  <Image
-                    source={!value.mainImageUrl ? this.state.noImage : { uri: value.mainImageUrl }}
-                    style={styles.itemsImage}
-                    PlaceholderContent={<ActivityIndicator />}
-                  />
+    // if (this.props.navigation.state.routeName === 'Favorite') {
+    //   db.transaction((tx) => {
+    //     tx.executeSql(
+    //       `select id from favoriteItems where id is not null;`,
+    //       null,
+    //       () => {  },
+    //     );
+    //   });
+    //   console.log(`idList is  ${idList}`);
+    // }
+    if (this.props.navigation.state.routeName === 'EachShopGenreScreen') {
+      if (this.state.openingGenreValue === 'allCoupon') {
+        const { allShopsArray } = this.state;
+        const arrayConcat = allShopsArray.restaurantStoreItems
+          .concat(
+            allShopsArray.shopStoreItems,
+            allShopsArray.beautyStoreItems,
+            allShopsArray.entertainmentStoreItems,
+            allShopsArray.hospitalStoreItems,
+            allShopsArray.othersStoreItems,
+            allShopsArray.sightseeingStoreItems,
+          );
+        return arrayConcat.map((value, index) => {
+          if (value.couponTag) {
+            return (
+              <TouchableOpacity
+                key={index}
+                onPress={() => { this.shopModalHandler(value); }}
+              >
+                <View style={styles.itemsBox}>
+                  <View style={styles.itemsImageBox}>
+                    <Image
+                      source={!value.mainImageUrl ? this.state.noImage : { uri: value.mainImageUrl }}
+                      style={styles.itemsImage}
+                      PlaceholderContent={<ActivityIndicator />}
+                    />
+                  </View>
+                  <View style={{ flexDirection: 'row' }}>
+                    {/* ショップ名 */}
+                    <View style={styles.itemsNameBox}>
+                      <Text style={styles.itemsName}>
+                        {value.name}
+                      </Text>
+                    </View>
+
+                    {/* タグ */}
+                    <View style={styles.rightSideItemsBox}>
+                      <View style={styles.shopTagsBackground}>
+                        <Text style={styles.itemsTag}>
+                          {value.genreTag}
+                        </Text>
+                      </View>
+
+                      {/* Likeボタン */}
+                      <TouchableOpacity
+                        style={styles.likeButtonBox}
+                        onPress={() => { this.handleLikeButton(value); }}
+                      >
+                        {this.handleLikeImage(value.name)}
+                      </TouchableOpacity>
+                    </View>
+                  </View>
                 </View>
-                <View style={{ flexDirection: 'row' }}>
+
+              </TouchableOpacity>
+            );
+          }
+        });
+      } if (this.state.openingGenreValue === 'allShop') {
+        const { allShopsArray } = this.state;
+        const arrayConcat = allShopsArray.restaurantStoreItems
+          .concat(
+            allShopsArray.shopStoreItems,
+            allShopsArray.beautyStoreItems,
+            allShopsArray.entertainmentStoreItems,
+            allShopsArray.hospitalStoreItems,
+            allShopsArray.othersStoreItems,
+            allShopsArray.sightseeingStoreItems,
+          );
+        return arrayConcat.map((value, index) => (
+          <TouchableOpacity
+            key={index}
+            onPress={() => { this.shopModalHandler(value); }}
+          >
+            <View style={styles.itemsBox}>
+              <View style={styles.itemsImageBox}>
+                <Image
+                  source={!value.mainImageUrl ? this.state.noImage : { uri: value.mainImageUrl }}
+                  style={styles.itemsImage}
+                  PlaceholderContent={<ActivityIndicator />}
+                />
+              </View>
+              <View style={{ flexDirection: 'row' }}>
+                {/* ショップ名 */}
+                <View style={styles.itemsNameBox}>
                   <Text style={styles.itemsName}>
                     {value.name}
                   </Text>
-                  <Text style={styles.itemsTag}>
-                    {value.tag}
-                  </Text>
                 </View>
-    
-                <View style={{ flexDirection: 'row' }}>
-                  <Text style={styles.itemsDescription}>
-                    {value.shortDescription}
-                  </Text>
-    
+
+                <View style={styles.rightSideItemsBox}>
+                  <View style={styles.shopTagsBackground}>
+                    <Text style={styles.itemsTag}>
+                      {value.genreTag}
+                    </Text>
+                  </View>
+
                   {/* Likeボタン */}
                   <TouchableOpacity
                     style={styles.likeButtonBox}
@@ -278,106 +349,58 @@ class Items extends React.Component {
                   >
                     {this.handleLikeImage(value.name)}
                   </TouchableOpacity>
-    
                 </View>
               </View>
-    
-            </TouchableOpacity>
-          );
-        }
-      });
-    } else if (this.state.openingGenreValue === 'allShop') {
-      const { allShopsArray } = this.state;
-      const arrayConcat = allShopsArray.restaurantStoreItems
-        .concat(
-          allShopsArray.shopStoreItems,
-          allShopsArray.beautyStoreItems,
-          allShopsArray.entertainmentStoreItems,
-          allShopsArray.hospitalStoreItems,
-          allShopsArray.othersStoreItems,
-          allShopsArray.sightseeingStoreItems,
-        );
-      return arrayConcat.map((value, index) => (
-        <TouchableOpacity
-          key={index}
-          onPress={() => { this.shopModalHandler(value); }}
-        >
-          <View style={styles.itemsBox}>
-            <View style={styles.itemsImageBox}>
-              <Image
-                source={!value.mainImageUrl ? this.state.noImage : { uri: value.mainImageUrl }}
-                style={styles.itemsImage}
-                PlaceholderContent={<ActivityIndicator />}
-              />
-            </View>
-            <View style={{ flexDirection: 'row' }}>
-              <Text style={styles.itemsName}>
-                {value.name}
-              </Text>
-              <Text style={styles.itemsTag}>
-                {value.tag}
-              </Text>
             </View>
 
-            <View style={{ flexDirection: 'row' }}>
-              <Text style={styles.itemsDescription}>
-                {value.shortDescription}
-              </Text>
+          </TouchableOpacity>
+        ));
+      } if (this.state.openingGenreValue !== 'allCoupon' && 'allShop') {
+        return this.state.itemsArray.map((value, index) => (
+          <TouchableOpacity
+            key={index}
+            onPress={() => { this.shopModalHandler(value); }}
+          >
+            <View style={styles.itemsBox}>
+              <View style={styles.itemsImageBox}>
+                <Image
+                  source={!value.mainImageUrl ? this.state.noImage : { uri: value.mainImageUrl }}
+                  style={styles.itemsImage}
+                  PlaceholderContent={<ActivityIndicator />}
+                />
+              </View>
+              <View style={{ flexDirection: 'row' }}>
 
-              {/* Likeボタン */}
-              <TouchableOpacity
-                style={styles.likeButtonBox}
-                onPress={() => { this.handleLikeButton(value); }}
-              >
-                {this.handleLikeImage(value.name)}
-              </TouchableOpacity>
+                {/* ショップ名 */}
+                <View style={styles.itemsNameBox}>
+                  <Text style={styles.itemsName}>
+                    {value.name}
+                  </Text>
+                </View>
 
-            </View>
-          </View>
+                <View style={styles.rightSideItemsBox}>
+                  <View style={styles.shopTagsBackground}>
+                    <Text style={styles.itemsTag}>
+                      {value.genreTag}
+                    </Text>
+                  </View>
 
-        </TouchableOpacity>
-      ));
-    } else if (this.state.openingGenreValue !== 'allCoupon' && 'allShop') {
-      return this.state.itemsArray.map((value, index) => (
-        <TouchableOpacity
-          key={index}
-          onPress={() => { this.shopModalHandler(value); }}
-        >
-          <View style={styles.itemsBox}>
-            <View style={styles.itemsImageBox}>
-              <Image
-                source={!value.mainImageUrl ? this.state.noImage : { uri: value.mainImageUrl }}
-                style={styles.itemsImage}
-                PlaceholderContent={<ActivityIndicator />}
-              />
-            </View>
-            <View style={{ flexDirection: 'row' }}>
-              <Text style={styles.itemsName}>
-                {value.name}
-              </Text>
-              <Text style={styles.itemsTag}>
-                {value.tag}
-              </Text>
-            </View>
+                  {/* Likeボタン */}
+                  <TouchableOpacity
+                    style={styles.likeButtonBox}
+                    onPress={() => { this.handleLikeButton(value); }}
+                  >
+                    {this.handleLikeImage(value.name)}
+                  </TouchableOpacity>
 
-            <View style={{ flexDirection: 'row' }}>
-              <Text style={styles.itemsDescription}>
-                {value.shortDescription}
-              </Text>
-
-              {/* Likeボタン */}
-              <TouchableOpacity
-                style={styles.likeButtonBox}
-                onPress={() => { this.handleLikeButton(value); }}
-              >
-                {this.handleLikeImage(value.name)}
-              </TouchableOpacity>
+                </View>
+              </View>
 
             </View>
-          </View>
 
-        </TouchableOpacity>
-      ));
+          </TouchableOpacity>
+        ));
+      }
     }
   }
 
@@ -417,6 +440,9 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
+  itemsNameBox: {
+    width: '70%',
+  },
   itemsName: {
     fontSize: 16,
     color: '#707070',
@@ -425,14 +451,24 @@ const styles = StyleSheet.create({
     marginLeft: 5,
     paddingLeft: 1,
   },
+  rightSideItemsBox: {
+    width: '28%',
+  },
+  shopTagsBackground: {
+    alignItems: 'center',
+    backgroundColor: '#BCB8B8',
+    borderWidth: 0.1,
+    borderRadius: 4,
+    marginLeft: 7,
+    overflow: 'hidden',
+  },
   itemsTag: {
     fontSize: 9,
     color: '#fff',
-    fontWeight: 'bold',
     backgroundColor: '#BCB8B8',
-    paddingTop: 4,
-    paddingLeft: 4,
-    paddingRight: 4,
+    fontWeight: 'bold',
+    paddingTop: 0,
+    margin: 3,
   },
   itemsDescription: {
     width: '65%',
@@ -443,8 +479,9 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
   },
   likeButtonBox: {
+    alignItems: 'center',
     paddingTop: 10,
-    paddingLeft: '14%',
+    paddingLeft: '17%',
   },
   likeButton: {
     width: 18,

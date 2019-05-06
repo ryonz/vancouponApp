@@ -20,7 +20,7 @@ class EachShopGenreScreen extends React.Component {
     };
   }
 
-  async componentDidMount() {
+  componentDidMount() {
     const { params } = this.props.navigation.state;
     //const { store } = this.props;
     const { headerTitle } = this.state;

@@ -22,7 +22,7 @@ class CouponModalRepetition extends React.Component {
 
         <View style={styles.couponLeftSideBox}>
           <Text style={styles.couponTextRightLine1}>
-            お好きな焼き菓子一個無料
+            {this.props.couponMessage}
           </Text>
         </View>
       </View>

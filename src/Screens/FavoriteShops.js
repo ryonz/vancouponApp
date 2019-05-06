@@ -16,8 +16,8 @@ class FavoriteShops extends React.Component {
   async componentDidMount() {
     try {
       await AsyncStorage.setItem('openingGenre', 'favorite')
-        .then((openingGenreValue) => {
-          console.log(openingGenreValue);
+        .then(() => {
+          //
         });
     } catch (error) {
       console.log(error);
