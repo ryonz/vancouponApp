@@ -94,9 +94,15 @@ class Items extends React.Component {
             tx.executeSql(
               `select id from favoriteItems where id is not null;`,
               null,
-              (_, { rows: { _array } }) => {
-                this.setState({ favoriteIDs: _array });
-                console.log(this.state.favoriteIDs.id);
+              (_, res) => {
+                const IDs = [];
+                const resultArray = res.rows._array;
+                for (let i = 0; i < resultArray.length; i++) {
+                  const ID = resultArray[i].id;
+                  IDs.push(ID);
+                }
+                this.setState({ favoriteIDs: IDs });
+                console.log(this.state.favoriteIDs);
               },
             );
           });
@@ -105,7 +111,7 @@ class Items extends React.Component {
     //SQLiteでTable「favoriteItems」作成,カラムにはIDとValueを設定
     db.transaction((tx) => {
       tx.executeSql(
-        `create table if not exists favoriteItems(id integer primary key not null);`,
+        `create table if not exists favoriteItems(id integer primary key not null, stateOfFavorite integer);`,
         null,
       );
     });
@@ -149,19 +155,7 @@ class Items extends React.Component {
       });
   }
 
-  handleSetStateToAllShopArray() {
-    const { store } = this.props;
-    this.setState({ allShopsArray: {
-      restaurantStoreItems: store.restaurantStore.Items,
-      shopStoreItems: store.shopStore.Items,
-      beautyStoreItems: store.beautyStore.Items,
-      sightseeingStoreItems: store.sightseeingStore.Items,
-      entertainmentStoreItems: store.entertainmentStore.Items,
-      hospitalStoreItems: store.hospitalStore.Items,
-      othersStoreItems: store.othersStore.Items,
-    } });
-  }
-
+  //各ストアの関数をすべて発火
   handleAllStoreFunction() {
     const { store } = this.props;
     const restaurantStore = store.restaurantStore;
@@ -181,6 +175,20 @@ class Items extends React.Component {
     othersStore.handleFirestoreCollectionOfOthers();
   }
 
+  //各ストアのアイテムをthis.state.allShopArrayのそれぞれのKeyに格納
+  handleSetStateToAllShopArray() {
+    const { store } = this.props;
+    this.setState({ allShopsArray: {
+      restaurantStoreItems: store.restaurantStore.Items,
+      shopStoreItems: store.shopStore.Items,
+      beautyStoreItems: store.beautyStore.Items,
+      sightseeingStoreItems: store.sightseeingStore.Items,
+      entertainmentStoreItems: store.entertainmentStore.Items,
+      hospitalStoreItems: store.hospitalStore.Items,
+      othersStoreItems: store.othersStore.Items,
+    } });
+  }
+
   componentWillUnmounted() {
     this.setState({ itemsArray: null });
   }
@@ -192,7 +200,7 @@ class Items extends React.Component {
       tx.executeSql(
         `insert into favoriteItems (id) values (${value.id});`,
         null,
-        () => { this.test(); },
+        () => {},
         () => {
           tx.executeSql(
             `delete from favoriteItems where id = ${value.id}`,
@@ -201,17 +209,6 @@ class Items extends React.Component {
             (error) => { console.log(error); },
           );
         },
-      );
-    });
-  }
-
-  test() {
-    db.transaction((tx) => {
-      tx.executeSql(
-        `select * from favoriteItems;`,
-        null,
-        (tx, res) => { console.log(res.rows); },
-        () => {},
       );
     });
   }
@@ -245,24 +242,72 @@ class Items extends React.Component {
 
   //Storeから取得した各ショップデータの配列をレンダリング
   renderItemBox() {
+    const { allShopsArray } = this.state;
+    const arrayConcat = allShopsArray.restaurantStoreItems
+      .concat(
+        allShopsArray.shopStoreItems,
+        allShopsArray.beautyStoreItems,
+        allShopsArray.entertainmentStoreItems,
+        allShopsArray.hospitalStoreItems,
+        allShopsArray.othersStoreItems,
+        allShopsArray.sightseeingStoreItems,
+      );
+    ///お気に入りItemのレンダリング
     if (this.props.navigation.state.routeName === 'Favorite') {
-      ///
+      const { favoriteIDs } = this.state;
+      return arrayConcat.map((value, index) => {
+        if (favoriteIDs.indexOf(value.id) >= 0) {
+          return (
+            <TouchableOpacity
+              key={index}
+              onPress={() => { this.shopModalHandler(value); }}
+            >
+              <View style={styles.itemsBox}>
+                <View style={styles.itemsImageBox}>
+                  <Image
+                    source={!value.mainImageUrl ? this.state.noImage : { uri: value.mainImageUrl }}
+                    style={styles.itemsImage}
+                    PlaceholderContent={<ActivityIndicator />}
+                  />
+                </View>
+                <View style={{ flexDirection: 'row' }}>
+                  {/* ショップ名 */}
+                  <View style={styles.itemsNameBox}>
+                    <Text style={styles.itemsName}>
+                      {value.name}
+                    </Text>
+                  </View>
+
+                  {/* タグ */}
+                  <View style={styles.rightSideItemsBox}>
+                    <View style={styles.shopTagsBackground}>
+                      <Text style={styles.itemsTag}>
+                        {value.genreTag}
+                      </Text>
+                    </View>
+
+                    {/* Likeボタン */}
+                    <TouchableOpacity
+                      style={styles.likeButtonBox}
+                      onPress={() => { this.handleLikeButton(value); }}
+                    >
+                      {this.handleLikeImage(value.name)}
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+
+            </TouchableOpacity>
+          );
+        }
+        if (favoriteIDs.indexOf(value.id) < 0) {
+          return;
+        }
+      });
     }
-    /////
-    ////
     ///
     if (this.props.navigation.state.routeName === 'EachShopGenreScreen') {
       if (this.state.openingGenreValue === 'allCoupon') {
-        const { allShopsArray } = this.state;
-        const arrayConcat = allShopsArray.restaurantStoreItems
-          .concat(
-            allShopsArray.shopStoreItems,
-            allShopsArray.beautyStoreItems,
-            allShopsArray.entertainmentStoreItems,
-            allShopsArray.hospitalStoreItems,
-            allShopsArray.othersStoreItems,
-            allShopsArray.sightseeingStoreItems,
-          );
         return arrayConcat.map((value, index) => {
           if (value.couponTag) {
             return (
@@ -310,16 +355,6 @@ class Items extends React.Component {
           }
         });
       } if (this.state.openingGenreValue === 'allShop') {
-        const { allShopsArray } = this.state;
-        const arrayConcat = allShopsArray.restaurantStoreItems
-          .concat(
-            allShopsArray.shopStoreItems,
-            allShopsArray.beautyStoreItems,
-            allShopsArray.entertainmentStoreItems,
-            allShopsArray.hospitalStoreItems,
-            allShopsArray.othersStoreItems,
-            allShopsArray.sightseeingStoreItems,
-          );
         return arrayConcat.map((value, index) => (
           <TouchableOpacity
             key={index}
