@@ -80,33 +80,26 @@ class Items extends React.Component {
             //開いてるページがその他の場合
             othersStore.handleFirestoreCollectionOfOthers();
           } else if (openingGenreValue === 'allCoupon') {
-            restaurantStore.handleFirestoreCollectionOfFoods();
-            shopStore.handleFirestoreCollectionOfShop();
-            beautyStore.handleFirestoreCollectionOfBeauty();
-            sightseeingStore.handleFirestoreCollectionOfSightseeing();
-            entertainmentStore.handleFirestoreCollectionOfEntertainment();
-            hospitalStore.handleFirestoreCollectionOfHospital();
-            othersStore.handleFirestoreCollectionOfOthers();
+            this.handleAllStoreFunction();
           } else if (openingGenreValue === 'allShop') {
-            restaurantStore.handleFirestoreCollectionOfFoods();
-            shopStore.handleFirestoreCollectionOfShop();
-            beautyStore.handleFirestoreCollectionOfBeauty();
-            sightseeingStore.handleFirestoreCollectionOfSightseeing();
-            entertainmentStore.handleFirestoreCollectionOfEntertainment();
-            hospitalStore.handleFirestoreCollectionOfHospital();
-            othersStore.handleFirestoreCollectionOfOthers();
+            this.handleAllStoreFunction();
           } else {
             //予期せぬエラーが発生した場合
             Alert.alert('予期せぬ不具合が発生いたしました。再度お試し下さい');
           }
         } else if (this.props.navigation.state.routeName === 'Favorite') {
-          restaurantStore.handleFirestoreCollectionOfFoods();
-          shopStore.handleFirestoreCollectionOfShop();
-          beautyStore.handleFirestoreCollectionOfBeauty();
-          sightseeingStore.handleFirestoreCollectionOfSightseeing();
-          entertainmentStore.handleFirestoreCollectionOfEntertainment();
-          hospitalStore.handleFirestoreCollectionOfHospital();
-          othersStore.handleFirestoreCollectionOfOthers();
+          this.handleAllStoreFunction();
+
+          db.transaction((tx) => {
+            tx.executeSql(
+              `select id from favoriteItems where id is not null;`,
+              null,
+              (_, { rows: { _array } }) => {
+                this.setState({ favoriteIDs: _array });
+                console.log(this.state.favoriteIDs.id);
+              },
+            );
+          });
         }
       });
     //SQLiteでTable「favoriteItems」作成,カラムにはIDとValueを設定
@@ -114,8 +107,6 @@ class Items extends React.Component {
       tx.executeSql(
         `create table if not exists favoriteItems(id integer primary key not null);`,
         null,
-        () => { console.log('suc'); },
-        () => { console.log('error'); },
       );
     });
     //現在のスクリーンの判定と、それに応じたストアの配列へのSET
@@ -146,40 +137,48 @@ class Items extends React.Component {
             //その他ストアの配列読み込み
             this.setState({ itemsArray: store.othersStore.Items });
           } else if (openingGenreValue === 'allCoupon') {
-            this.setState({ allShopsArray: {
-              restaurantStoreItems: store.restaurantStore.Items,
-              shopStoreItems: store.shopStore.Items,
-              beautyStoreItems: store.beautyStore.Items,
-              sightseeingStoreItems: store.sightseeingStore.Items,
-              entertainmentStoreItems: store.entertainmentStore.Items,
-              hospitalStoreItems: store.hospitalStore.Items,
-              othersStoreItems: store.othersStore.Items,
-            } });
+            this.handleSetStateToAllShopArray();
           } else if (openingGenreValue === 'allShop') {
-            this.setState({ allShopsArray: {
-              restaurantStoreItems: store.restaurantStore.Items,
-              shopStoreItems: store.shopStore.Items,
-              beautyStoreItems: store.beautyStore.Items,
-              sightseeingStoreItems: store.sightseeingStore.Items,
-              entertainmentStoreItems: store.entertainmentStore.Items,
-              hospitalStoreItems: store.hospitalStore.Items,
-              othersStoreItems: store.othersStore.Items,
-            } });
+            this.handleSetStateToAllShopArray();
           } else {
             //Alert.alert('予期せぬ不具合が発生いたしました。再度お試し下さい');
           }
         } else if (currentScreen === 'Favorite') {
-          this.setState({ allShopsArray: {
-            restaurantStoreItems: store.restaurantStore.Items,
-            shopStoreItems: store.shopStore.Items,
-            beautyStoreItems: store.beautyStore.Items,
-            sightseeingStoreItems: store.sightseeingStore.Items,
-            entertainmentStoreItems: store.entertainmentStore.Items,
-            hospitalStoreItems: store.hospitalStore.Items,
-            othersStoreItems: store.othersStore.Items,
-          } });
+          this.handleSetStateToAllShopArray();
         }
       });
+  }
+
+  handleSetStateToAllShopArray() {
+    const { store } = this.props;
+    this.setState({ allShopsArray: {
+      restaurantStoreItems: store.restaurantStore.Items,
+      shopStoreItems: store.shopStore.Items,
+      beautyStoreItems: store.beautyStore.Items,
+      sightseeingStoreItems: store.sightseeingStore.Items,
+      entertainmentStoreItems: store.entertainmentStore.Items,
+      hospitalStoreItems: store.hospitalStore.Items,
+      othersStoreItems: store.othersStore.Items,
+    } });
+  }
+
+  handleAllStoreFunction() {
+    const { store } = this.props;
+    const restaurantStore = store.restaurantStore;
+    const beautyStore = store.beautyStore;
+    const shopStore = store.shopStore;
+    const sightseeingStore = store.sightseeingStore;
+    const entertainmentStore = store.entertainmentStore;
+    const hospitalStore = store.hospitalStore;
+    const othersStore = store.othersStore;
+
+    restaurantStore.handleFirestoreCollectionOfFoods();
+    shopStore.handleFirestoreCollectionOfShop();
+    beautyStore.handleFirestoreCollectionOfBeauty();
+    sightseeingStore.handleFirestoreCollectionOfSightseeing();
+    entertainmentStore.handleFirestoreCollectionOfEntertainment();
+    hospitalStore.handleFirestoreCollectionOfHospital();
+    othersStore.handleFirestoreCollectionOfOthers();
   }
 
   componentWillUnmounted() {
@@ -193,7 +192,7 @@ class Items extends React.Component {
       tx.executeSql(
         `insert into favoriteItems (id) values (${value.id});`,
         null,
-        () => { console.log('insert suc'); },
+        () => { this.test(); },
         () => {
           tx.executeSql(
             `delete from favoriteItems where id = ${value.id}`,
@@ -202,6 +201,17 @@ class Items extends React.Component {
             (error) => { console.log(error); },
           );
         },
+      );
+    });
+  }
+
+  test() {
+    db.transaction((tx) => {
+      tx.executeSql(
+        `select * from favoriteItems;`,
+        null,
+        (tx, res) => { console.log(res.rows); },
+        () => {},
       );
     });
   }
@@ -235,16 +245,12 @@ class Items extends React.Component {
 
   //Storeから取得した各ショップデータの配列をレンダリング
   renderItemBox() {
-    // if (this.props.navigation.state.routeName === 'Favorite') {
-    //   db.transaction((tx) => {
-    //     tx.executeSql(
-    //       `select id from favoriteItems where id is not null;`,
-    //       null,
-    //       () => {  },
-    //     );
-    //   });
-    //   console.log(`idList is  ${idList}`);
-    // }
+    if (this.props.navigation.state.routeName === 'Favorite') {
+      ///
+    }
+    /////
+    ////
+    ///
     if (this.props.navigation.state.routeName === 'EachShopGenreScreen') {
       if (this.state.openingGenreValue === 'allCoupon') {
         const { allShopsArray } = this.state;
@@ -494,65 +500,3 @@ const styles = StyleSheet.create({
 });
 
 export default Items;
-
-
-// id,
-// name,
-// catchCopy,
-// couponType,
-// couponTag,
-// genreTag,
-// shortDescription,
-// longDescription,
-// address,
-// latitude,
-// longitude,
-// time0,
-// time1,
-// time2,
-// time3,
-// time4,
-// time5,
-// time6,
-// facebook,
-// instagram,
-// twitter,
-// mainImageUrl,
-// note1,
-// note2,
-// note3,
-// note4,
-// phoneNumber,
-// qrcodeUrl,
-// webPage
-// )
-// values (
-// ${value.id},
-// ${value.name},
-// ${value.catchCopy},
-// ${value.couponType},
-// ${value.couponTag},
-// ${value.genreTag},
-// ${value.shortDescription},
-// ${value.longDescription},
-// ${value.address},
-// ${value.latitude},
-// ${value.longitude},
-// ${value.time0},
-// ${value.time1},
-// ${value.time2},
-// ${value.time3},
-// ${value.time4},
-// ${value.time5},
-// ${value.time6},
-// ${value.facebook},
-// ${value.instagram},
-// ${value.twitter},
-// ${value.mainImageUrl},
-// ${value.note1},
-// ${value.note2},
-// ${value.note3},
-// ${value.note4},
-// ${value.phoneNumber},
-// ${value.qrcodeUrl},
-// ${value.webPage}
