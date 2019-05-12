@@ -10,6 +10,7 @@ import {
   Text,
   Modal,
 } from 'react-native';
+import { SQLite } from 'expo';
 import { observer } from 'mobx-react/native';
 import { Button, Image } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -20,20 +21,32 @@ import CouponModalPoint from './CouponModals/CouponModalPoint';
 import QrcodeReader from './QrcodeReader';
 import QRcode from '../Stores/QRcodeStore';
 
+const db = SQLite.openDatabase('db.db');
+
 @observer
 class ShopModal extends React.Component {
-  state = {
-    detailTimeModal: false,
-    qrcodeReaderModalVisible: false,
-    couponModalStatus: QRcode.couponModalStatus,
-    asyncStoragevalue: '',
-    noImage: require('../../assets/Images/Images/noImage.001.jpeg'),
+  constructor(props) {
+    super(props);
+    this.state = {
+      liked: false,
+      detailTimeModal: false,
+      qrcodeReaderModalVisible: false,
+      couponModalStatus: QRcode.couponModalStatus,
+      asyncStoragevalue: '',
+      noImage: require('../../assets/Images/Images/noImage.001.jpeg'),
+    };
   }
 
   async componentDidMount() {
     const { value } = this.props.navigation.state.params;
     const asyncStoragevalue = await AsyncStorage.getItem(`${value.qrcodeUrl}`);
     this.setState({ asyncStoragevalue });
+    await AsyncStorage.getItem(`${value.name}.favorite`)
+      .then((e) => {
+        if (e === 'true') {
+          this.setState({ liked: true });
+        }
+      });
   }
 
   //営業時間ModalのVisibleの変更
@@ -46,6 +59,34 @@ class ShopModal extends React.Component {
     }
   }
 
+  //お気に入り登録・解除
+  onPressLikeButton(value) {
+    db.transaction((tx) => {
+      tx.executeSql(
+        `insert into favoriteItems (id) values (${value.id});`,
+        null,
+        () => {
+          console.log('insert id suc');
+          this.setState({ liked: true });
+          AsyncStorage.setItem(`${value.name}.favorite`, 'true')
+            .then(() => {
+              console.log('set id into AsyncStorage suc');
+            });
+        },
+        () => {
+          this.setState({ liked: false });
+          AsyncStorage.setItem(`${value.name}.favorite`, 'false');
+          tx.executeSql(
+            `delete from favoriteItems where id = ${value.id};`,
+            null,
+            () => { console.log('Delete id suc'); },
+            () => { console.log('Delete id error'); },
+          );
+        },
+      );
+    });
+  }
+
   //QRコードリーダーModalのVisibleの変更
   handleOpenQrcodeReader() {
     const { qrcodeReaderModalVisible } = this.state;
@@ -54,16 +95,6 @@ class ShopModal extends React.Component {
     } else if (qrcodeReaderModalVisible) {
       this.setState({ qrcodeReaderModalVisible: false });
     }
-  }
-
-  //お気に入りボタン
-  handleLikeButton() {
-    return (
-      <Image
-        style={styles.likeButton}
-        source={require('../../assets/Images/Icons/like.png')}
-      />
-    );
   }
 
   //クーポンモーダル表示・非表示処理
@@ -86,6 +117,26 @@ class ShopModal extends React.Component {
   //前のスクリーンに戻るボタン
   handleBackButton() {
     this.props.navigation.goBack();
+  }
+
+  //お気に入りボタンのレンダー
+  renderLikeButton(value) {
+    if (this.state.liked) {
+      return (
+        <Image
+          source={require('../../assets/Images/Icons/likeRed.png')}
+          style={styles.likeButton}
+        />
+      );
+    }
+    if (!this.state.liked) {
+      return (
+        <Image
+          style={styles.likeButton}
+          source={require('../../assets/Images/Icons/like.png')}
+        />
+      );
+    }
   }
 
   // QRコードリーダーモーダル
@@ -166,11 +217,7 @@ class ShopModal extends React.Component {
     const { value } = this.props.navigation.state.params;
     if (value.genreTag && value.couponTag) {
       return (
-        <View style={styles.titleBoxFirstLine}>
-          {/* お店の名前 */}
-          <Text style={styles.shopTitle}>
-            {value.name}
-          </Text>
+        <View style={styles.titleBoxTagLine}>
 
           {/* ジャンルタグ */}
           <View style={styles.shopTagsBackground}>
@@ -189,11 +236,7 @@ class ShopModal extends React.Component {
       );
     } if (value.genreTag && !value.couponTag) {
       return (
-        <View style={styles.titleBoxFirstLine}>
-          {/* お店の名前 */}
-          <Text style={styles.shopTitle}>
-            {value.name}
-          </Text>
+        <View style={styles.titleBoxTagLine}>
 
           {/* ジャンルタグ */}
           <View style={styles.shopTagsBackground}>
@@ -205,11 +248,7 @@ class ShopModal extends React.Component {
       );
     } if (!value.genreTag && value.couponTag) {
       return (
-        <View style={styles.titleBoxFirstLine}>
-          {/* お店の名前 */}
-          <Text style={styles.shopTitle}>
-            {value.name}
-          </Text>
+        <View style={styles.titleBoxTagLine}>
 
           {/* ジャンルタグ */}
           <View style={styles.shopTagsBackground}>
@@ -236,33 +275,61 @@ class ShopModal extends React.Component {
                 PlaceholderContent={<ActivityIndicator />}
               />
             </View>
+
+            {/* タイトルボックス */}
             <View style={styles.titleBox}>
 
-              {this.renderShopTags()}
+              {/* お店の名前 */}
+              <View style={styles.shopTitleBox}>
+                <Text style={styles.shopTitle}>
+                  {value.name}
+                </Text>
+              </View>
 
+              {/* お気に入りボタン */}
               <TouchableOpacity
                 style={styles.likeButtonBox}
+                onPress={() => { this.onPressLikeButton(value); }}
               >
-                {this.handleLikeButton()}
+                {this.renderLikeButton()}
               </TouchableOpacity>
 
               <View style={styles.titleBoxSecondLine}>
-                <Text style={styles.shortDescription}>{value.shortDescription}</Text>
+                <Text style={styles.shortDescription}>
+                  {value.shortDescription}
+                </Text>
               </View>
+
+              {/* タグ */}
+              {this.renderShopTags()}
+
             </View>
 
-            <Text style={styles.boxTitle}>詳細</Text>
+            {/* 詳細ボックス */}
+            <Text style={styles.boxTitle}>
+              詳細
+            </Text>
 
             <View style={styles.detailBox}>
               <View style={styles.detailEachBox}>
-                <Image style={styles.iconImage} source={require('../../assets/Images/Icons/star.png')} />
-                <Text style={styles.detailText}>{value.catchCopy}</Text>
+                <Image
+                  style={styles.iconImage}
+                  source={require('../../assets/Images/Icons/star.png')}
+                />
+                <Text
+                  style={styles.detailText}
+                >
+                  {value.catchCopy}
+                </Text>
               </View>
 
               <View style={styles.detailEachBoxUnderBar} />
 
               <TouchableOpacity style={styles.detailEachBox}>
-                <Image style={styles.iconImage} source={require('../../assets/Images/Icons/auricular-phone-symbol-in-a-circle.png')} />
+                <Image
+                  style={styles.iconImage}
+                  source={require('../../assets/Images/Icons/auricular-phone-symbol-in-a-circle.png')}
+                />
                 <Text style={styles.detailText}>{value.phoneNumber}</Text>
               </TouchableOpacity>
 
@@ -294,6 +361,8 @@ class ShopModal extends React.Component {
                 style={styles.mapContainer}
                 latitude={value.latitude}
                 longitude={value.longitude}
+                latitude1={value.latitude1}
+                longitude1={value.longitude1}
               />
 
               <View style={styles.addressContainerBox}>
@@ -308,11 +377,15 @@ class ShopModal extends React.Component {
             </View>
 
 
-            <Text style={styles.boxTitle}>お店の紹介</Text>
+            <Text style={styles.boxTitle}>
+              お店の紹介
+            </Text>
 
 
             <View style={styles.shopDescriptionBox}>
-              <Text style={styles.shopDescription}>{value.longDescription}</Text>
+              <Text style={styles.shopDescription}>
+                {value.longDescription}
+              </Text>
             </View>
 
             <Text style={styles.boxTitle}>クーポン利用の注意点</Text>
@@ -417,35 +490,45 @@ const styles = StyleSheet.create({
   },
   titleBox: {
     width: '100%',
-    height: 105,
+    height: 'auto',
     backgroundColor: '#fff',
     borderWidth: 0.3,
     borderColor: '#707070',
+    padding: 16,
   },
-  titleBoxFirstLine: {
+  titleBoxTagLine: {
+    width: '75%',
     flexDirection: 'row',
     marginTop: 16,
-    marginLeft: 16,
     marginRight: 16,
+  },
+  shopTitleBox: {
+    width: '70%',
+    height: 'auto',
   },
   shopTitle: {
     fontSize: 20,
     fontWeight: 'bold',
   },
   shopTagsBackground: {
+    alignItems: 'center',
     backgroundColor: '#BCB8B8',
     borderWidth: 0.1,
     borderRadius: 5,
+    paddingTop: 5,
+    paddingBottom: 5,
+    paddingLeft: 7,
+    paddingRight: 7,
     marginLeft: 7,
     overflow: 'hidden',
   },
   shopTags: {
     color: '#fff',
-    fontSize: 10,
+    fontSize: 11,
     fontWeight: 'bold',
-    paddingTop: 5,
-    paddingLeft: 5,
-    paddingRight: 5,
+    // paddingTop: 5,
+    // paddingLeft: 5,
+    // paddingRight: 5,
   },
   likeButtonBox: {
     position: 'absolute',
@@ -455,17 +538,16 @@ const styles = StyleSheet.create({
     marginTop: 18,
   },
   likeButton: {
-    width: 18,
-    height: 18,
+    width: 23,
+    height: 23,
   },
   titleBoxSecondLine: {
     marginTop: 8,
-    marginLeft: 16,
     marginRight: 16,
   },
   shortDescription: {
     color: '#707070',
-    fontSize: 9,
+    fontSize: 11,
     fontWeight: '400',
     lineHeight: 15,
   },
@@ -484,10 +566,13 @@ const styles = StyleSheet.create({
     borderColor: '#707070',
   },
   detailEachBox: {
+    alignItems: 'center',
     flexDirection: 'row',
     width: '100%',
-    height: 30,
-    paddingTop: 11,
+    height: 'auto',
+    margin: 4,
+    paddingRight: 4,
+    overflow: 'hidden',
   },
   detailEachBoxTime: {
     width: '100%',
@@ -503,7 +588,8 @@ const styles = StyleSheet.create({
     fontSize: 9,
     fontWeight: '500',
     color: '#707070',
-    marginLeft: 4,
+    margin: 4,
+    overflow: 'hidden',
   },
   detailTextTime: {
     fontSize: 10,

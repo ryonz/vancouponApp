@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   AsyncStorage,
 } from 'react-native';
+import { isiPhoneEight, isiPhoneSE } from '../../lib/windowsize';
 
 class HomeAllCouponListButton extends React.Component {
   async handleOnPressNavigation() {
@@ -53,19 +54,20 @@ const styles = StyleSheet.create({
   },
   buttonBox: {
     width: '98%',
-    height: 42,
+    height: isiPhoneSE() ? 30 : 42,
     borderRadius: 6,
     alignItems: 'center',
     borderColor: '#707070',
     borderWidth: 0.5,
     marginLeft: 4,
     marginRight: 4,
+    marginTop: isiPhoneEight() ? 30 : 0,
   },
   buttonTitleText: {
-    fontSize: 16,
+    fontSize: isiPhoneSE() ? 13 : 16,
     fontWeight: '800',
     color: '#707070',
-    paddingTop: '3%',
+    paddingTop: isiPhoneSE() ? '2%' : '3%',
   },
 });
 

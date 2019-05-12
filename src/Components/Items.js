@@ -9,10 +9,12 @@ import {
   AsyncStorage,
   TouchableOpacity,
   Dimensions,
+  RefreshControl,
 } from 'react-native';
 import { SQLite } from 'expo';
 import { inject, observer } from 'mobx-react/native';
 import { Image } from 'react-native-elements';
+import { isiPhoneSE } from '../lib/windowsize';
 
 const db = SQLite.openDatabase('db.db');
 
@@ -22,7 +24,7 @@ class Items extends React.Component {
   constructor() {
     super();
     this.state = {
-      like: false,
+      refreshing: false,
       noImage: require('../../assets/Images/Images/noImage.001.jpeg'),
       openingGenreValue: '',
 
@@ -42,7 +44,17 @@ class Items extends React.Component {
     };
   }
 
-  async componentDidMount() {
+  componentDidMount() {
+    this.DidMountFunctions();
+  }
+
+  onRefresh() {
+    this.setState({ refreshing: true });
+    this.DidMountFunctions().then(() => { this.setState({ refreshing: false }); });
+  }
+
+  async DidMountFunctions() {
+    this.setState({ refreshing: true });
     const { store } = this.props;
     const restaurantStore = store.restaurantStore;
     const beautyStore = store.beautyStore;
@@ -51,7 +63,6 @@ class Items extends React.Component {
     const entertainmentStore = store.entertainmentStore;
     const hospitalStore = store.hospitalStore;
     const othersStore = store.othersStore;
-    //console.log(this.props.navigation.state.routeName);
 
     await AsyncStorage.getItem('openingGenre')
       .then((openingGenreValue) => {
@@ -147,32 +158,26 @@ class Items extends React.Component {
           } else if (openingGenreValue === 'allShop') {
             this.handleSetStateToAllShopArray();
           } else {
-            //Alert.alert('予期せぬ不具合が発生いたしました。再度お試し下さい');
+            Alert.alert('予期せぬ不具合が発生いたしました。再度お試し下さい');
           }
         } else if (currentScreen === 'Favorite') {
           this.handleSetStateToAllShopArray();
         }
       });
+    setTimeout(() => { this.setState({ refreshing: false }); }, 2000);
   }
 
-  //各ストアの関数をすべて発火
-  handleAllStoreFunction() {
-    const { store } = this.props;
-    const restaurantStore = store.restaurantStore;
-    const beautyStore = store.beautyStore;
-    const shopStore = store.shopStore;
-    const sightseeingStore = store.sightseeingStore;
-    const entertainmentStore = store.entertainmentStore;
-    const hospitalStore = store.hospitalStore;
-    const othersStore = store.othersStore;
+  refreshControl() {
+    return (
+      <RefreshControl
+        refreshing={this.state.refreshing}
+        onRefresh={() => { this.onRefresh(); }}
+      />
+    );
+  }
 
-    restaurantStore.handleFirestoreCollectionOfFoods();
-    shopStore.handleFirestoreCollectionOfShop();
-    beautyStore.handleFirestoreCollectionOfBeauty();
-    sightseeingStore.handleFirestoreCollectionOfSightseeing();
-    entertainmentStore.handleFirestoreCollectionOfEntertainment();
-    hospitalStore.handleFirestoreCollectionOfHospital();
-    othersStore.handleFirestoreCollectionOfOthers();
+  componentWillUnmounted() {
+    this.setState({ itemsArray: null });
   }
 
   //各ストアのアイテムをthis.state.allShopArrayのそれぞれのKeyに格納
@@ -189,53 +194,27 @@ class Items extends React.Component {
     } });
   }
 
-  componentWillUnmounted() {
-    this.setState({ itemsArray: null });
-  }
-
-  //お気に入り登録、削除処理
-  handleLikeButton(value, array) {
-    //SQliteへのお気に入りIDの追加と削除
-    db.transaction((tx) => {
-      tx.executeSql(
-        `insert into favoriteItems (id) values (${value.id});`,
-        null,
-        () => {},
-        () => {
-          tx.executeSql(
-            `delete from favoriteItems where id = ${value.id}`,
-            null,
-            () => { console.log('delete id suc'); },
-            (error) => { console.log(error); },
-          );
-        },
-      );
-    });
-  }
-
-  //
-  handleLikeImage(name) {
-    const checkFavorite = AsyncStorage.getItem(`${name}.favorite`);
-    if (checkFavorite === 'true') {
-      return (
-        <Image
-          source={require('../../assets/Images/Icons/likeRed.png')}
-          style={styles.likeButton}
-        />
-      );
-    }
-    if (checkFavorite !== 'true') {
-      return (
-        <Image
-          source={require('../../assets/Images/Icons/like.png')}
-          style={styles.likeButton}
-        />
-      );
-    }
+  //各ストアの関数をすべて発火
+  handleAllStoreFunction() {
+    const { store } = this.props;
+    const restaurantStore = store.restaurantStore;
+    const beautyStore = store.beautyStore;
+    const shopStore = store.shopStore;
+    const sightseeingStore = store.sightseeingStore;
+    const entertainmentStore = store.entertainmentStore;
+    const hospitalStore = store.hospitalStore;
+    const othersStore = store.othersStore;
+  
+    restaurantStore.handleFirestoreCollectionOfFoods();
+    shopStore.handleFirestoreCollectionOfShop();
+    beautyStore.handleFirestoreCollectionOfBeauty();
+    sightseeingStore.handleFirestoreCollectionOfSightseeing();
+    entertainmentStore.handleFirestoreCollectionOfEntertainment();
+    hospitalStore.handleFirestoreCollectionOfHospital();
+    othersStore.handleFirestoreCollectionOfOthers();
   }
 
   shopModalHandler(value) {
-    //console.log(value);
     const { navigate } = this.props.navigation;
     navigate('ShopModal', { value });
   }
@@ -286,13 +265,6 @@ class Items extends React.Component {
                       </Text>
                     </View>
 
-                    {/* Likeボタン */}
-                    <TouchableOpacity
-                      style={styles.likeButtonBox}
-                      onPress={() => { this.handleLikeButton(value); }}
-                    >
-                      {this.handleLikeImage(value.name)}
-                    </TouchableOpacity>
                   </View>
                 </View>
               </View>
@@ -339,13 +311,6 @@ class Items extends React.Component {
                         </Text>
                       </View>
 
-                      {/* Likeボタン */}
-                      <TouchableOpacity
-                        style={styles.likeButtonBox}
-                        onPress={() => { this.handleLikeButton(value); }}
-                      >
-                        {this.handleLikeImage(value.name)}
-                      </TouchableOpacity>
                     </View>
                   </View>
                 </View>
@@ -383,13 +348,6 @@ class Items extends React.Component {
                     </Text>
                   </View>
 
-                  {/* Likeボタン */}
-                  <TouchableOpacity
-                    style={styles.likeButtonBox}
-                    onPress={() => { this.handleLikeButton(value); }}
-                  >
-                    {this.handleLikeImage(value.name)}
-                  </TouchableOpacity>
                 </View>
               </View>
             </View>
@@ -426,14 +384,6 @@ class Items extends React.Component {
                     </Text>
                   </View>
 
-                  {/* Likeボタン */}
-                  <TouchableOpacity
-                    style={styles.likeButtonBox}
-                    onPress={() => { this.handleLikeButton(value); }}
-                  >
-                    {this.handleLikeImage(value.name)}
-                  </TouchableOpacity>
-
                 </View>
               </View>
 
@@ -450,6 +400,7 @@ class Items extends React.Component {
       <View style={styles.container}>
         <ScrollView
           contentContainerStyle={{ flexDirection: 'row', flexWrap: 'wrap' }}
+          refreshControl={this.refreshControl()}
         >
           {this.renderItemBox()}
         </ScrollView>
@@ -483,10 +434,11 @@ const styles = StyleSheet.create({
   },
   itemsNameBox: {
     width: '70%',
-    height: '90%',
+    height: 'auto',
+    overflow: 'hidden',
   },
   itemsName: {
-    fontSize: 16,
+    fontSize: isiPhoneSE() ? 12 : 16,
     color: '#707070',
     fontWeight: 'bold',
     marginRight: 10,

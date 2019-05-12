@@ -6,6 +6,10 @@ class Map extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      marker: {
+        latitude: this.props.latitude,
+        longitude: this.props.longitude,
+      },
       markers: [
         {
           coordinates:
@@ -14,20 +18,40 @@ class Map extends React.Component {
               longitude: this.props.longitude,
             },
         },
+        {
+          coordinates:
+            {
+              latitude: this.props.latitude1,
+              longitude: this.props.longitude1,
+            },
+        },
       ],
     };
   }
 
   /* eslint no-unused-expressions: "off" */
   renderMapMarker() {
-    return this.state.markers.map((marker, index) => {
-      <MapView.Marker
-        index={index}
-        coordinate={marker.coordinates}
-      >
-        <Icon name="map-marker" size={40} color="red" />
-      </MapView.Marker>;
-    });
+    if (this.props.latitude1) {
+      return this.state.markers.map((marker, index) => {
+        return (
+          <MapView.Marker
+            key={index}
+            coordinate={marker.coordinates}
+          >
+            <Icon name="map-marker" size={40} color="red" />
+          </MapView.Marker>
+        );
+      });
+    }
+    if (!this.props.latitude1) {
+      return (
+        <MapView.Marker
+          coordinate={this.state.marker}
+        >
+          <Icon name="map-marker" size={40} color="red" />
+        </MapView.Marker>
+      );
+    }
   }
 
   render() {

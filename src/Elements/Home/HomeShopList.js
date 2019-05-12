@@ -8,16 +8,16 @@ import {
   AsyncStorage,
   Image,
 } from 'react-native';
-import { observer } from 'mobx-react/native';
-import RootStore from '../../Stores/RootStore';
-
-const rootStore = new RootStore();
+import { isiPhoneEight, isiPhoneSE } from '../../lib/windowsize';
 
 const listImageSource = {
   food: require('../../../assets/Images/Home/HomeListImageFood.jpg'),
   shop: require('../../../assets/Images/Home/HomeListImageShop.jpg'),
   beauty: require('../../../assets/Images/Home/HomeListImageBeauty.jpg'),
   sightseeing: require('../../../assets/Images/Home/HomeListImageSightseeing.jpg'),
+  hospital: require('../../../assets/Images/Home/HomeListItemImageHospital.jpg'),
+  entertainment: require('../../../assets/Images/Home/HomeListImageEntertainment.jpg'),
+  other: require('../../../assets/Images/Home/HomeListImageOther.jpg'),
 };
 
 const shopLists = [
@@ -25,9 +25,9 @@ const shopLists = [
   { genre: 'お店', image: listImageSource.shop },
   { genre: '美容', image: listImageSource.beauty },
   { genre: '観光', image: listImageSource.sightseeing },
-  { genre: 'エンタメ', image: listImageSource.beauty },
-  { genre: '病院', image: listImageSource.beauty },
-  { genre: 'その他', image: listImageSource.beauty },
+  { genre: 'エンタメ', image: listImageSource.entertainment },
+  { genre: '病院', image: listImageSource.hospital },
+  { genre: 'その他', image: listImageSource.other },
 ];
 
 class HomeShopList extends React.Component {
@@ -89,7 +89,6 @@ class HomeShopList extends React.Component {
               }
             }
           }}
-
         >
           <View style={styles.shopListBox}>
             <Image
@@ -116,7 +115,9 @@ class HomeShopList extends React.Component {
     return (
       <View style={styles.container}>
         <View style={styles.shopListQuestionTextBox}>
-          <Text style={styles.shopListQuestionText}>どんなクーポンをお探しですか？</Text>
+          <Text style={styles.shopListQuestionText}>
+            どんなクーポンをお探しですか？
+          </Text>
         </View>
         <ScrollView
           horizontal
@@ -133,9 +134,9 @@ const styles = StyleSheet.create({
     flex: 0.3,
   },
   shopListBox: {
-    width: 140,
+    width: '37%',
     height: 105,
-    marginTop: 30,
+    marginTop: isiPhoneEight() ? 10 : isiPhoneSE() ? 15 : 30,
     marginLeft: 16,
     shadowOffset: {
       width: 1,
@@ -144,34 +145,34 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.8,
   },
   shopListImage: {
-    width: 140,
-    height: 120,
+    width: isiPhoneSE() ? 110 : 140,
+    height: isiPhoneSE() ? 90 : 120,
     borderRadius: 4,
   },
   shopListTextBox: {
     position: 'absolute',
-    top: '44%',
+    top: isiPhoneSE() ? '32%' : '44%',
     left: '0%',
-    width: 140,
+    width: isiPhoneSE() ? 110 : 140,
     paddingTop: '3%',
     paddingBottom: '2%',
     backgroundColor: 'rgba(111,111,111,0.8)',
 
   },
   shopListText: {
-    fontSize: 25,
+    fontSize: isiPhoneSE() ? 20 : 25,
     fontWeight: '900',
     color: '#fff',
     paddingLeft: '33%',
   },
   shopListTextLength3: {
-    fontSize: 25,
+    fontSize: isiPhoneSE() ? 20 : 25,
     fontWeight: '900',
     color: '#fff',
     paddingLeft: '25%',
   },
   shopListTextLength4: {
-    fontSize: 25,
+    fontSize: isiPhoneSE() ? 20 : 25,
     fontWeight: '900',
     color: '#fff',
     paddingLeft: '18%',
@@ -182,7 +183,7 @@ const styles = StyleSheet.create({
     paddingTop: '5%',
   },
   shopListQuestionText: {
-    fontSize: 20,
+    fontSize: isiPhoneSE() ? 15 : 20,
     fontWeight: '900',
   },
 });

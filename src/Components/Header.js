@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { isiPhoneEight, isiPhoneSE } from '../lib/windowsize';
 
 class Header extends React.Component {
   //前のスクリーンに戻るボタン
@@ -39,7 +40,6 @@ class Header extends React.Component {
 
 const styles = StyleSheet.create({
   container: {
-    // flex: 0.13,
     width: '100%',
     height: Dimensions.get('window').height * 0.12,
     justifyContent: 'center',
@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: '#fff',
     fontWeight: '900',
-    paddingTop: '13%',
+    paddingTop: isiPhoneEight() ? '8%' : isiPhoneSE() ? '10%' : '13%',
   },
   backButtonBox: {
     position: 'absolute',
@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
   backButtonIcon: {
     fontSize: 23,
     color: '#fff',
-    marginTop: 15,
+    marginTop: isiPhoneEight() ? 0 : isiPhoneSE() ? 0 : 15,
     marginLeft: 14,
   },
 });

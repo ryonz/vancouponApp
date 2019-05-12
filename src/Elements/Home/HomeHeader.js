@@ -12,7 +12,7 @@ class HomeHeader extends React.Component {
       <View style={styles.container}>
         <Image
           style={styles.homeHeaderImage}
-          source ={require('../../../assets/Images/Home/HomeHeaderImage1024_683.jpg')}
+          source={require('../../../assets/Images/Home/HomeHeaderImage1024_683.jpg')}
         />
         <View style={styles.homeHeaderTitleBox}>
           <Text style={styles.homeHeaderTitle}>
@@ -22,7 +22,7 @@ class HomeHeader extends React.Component {
           </Text>
         </View>
       </View>
-    )
+    );
   }
 }
 
