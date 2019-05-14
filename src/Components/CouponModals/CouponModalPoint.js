@@ -42,9 +42,8 @@ class CouponModalPoint extends React.Component {
         <View style={styles.lineBetweenRightAndLeftBox} />
 
         <View style={styles.couponLeftSideBox}>
-          <Text style={styles.couponTextRightLine1}>2pt: 10% オフ</Text>
-          <Text style={styles.couponTextRightLine2}>5pt: ボーナスチャンス</Text>
-          <Text style={styles.couponTextRightLine3}>10pt: ボーナスチャンス</Text>
+          <Text style={styles.couponTextRightLine1}>ポイントの詳細は</Text>
+          <Text style={styles.couponTextRightLine2}>「クーポン利用の注意点」</Text>
         </View>
       </View>
     );
@@ -101,21 +100,21 @@ const styles = StyleSheet.create({
     width: '68%',
     height: 120,
     alignItems: 'center',
+    overflow: 'hidden',
   },
   couponTextRightLine1: {
     fontSize: 17,
+    width: '90%',
     fontWeight: '500',
-    marginTop: 25,
+    marginTop: 40,
+    overflow: 'hidden',
   },
   couponTextRightLine2: {
     fontSize: 17,
+    width: '90%',
     fontWeight: '500',
-    marginTop: 5,
-  },
-  couponTextRightLine3: {
-    fontSize: 17,
-    fontWeight: '500',
-    marginTop: 5,
+    marginTop: 10,
+    overflow: 'hidden',
   },
 });
 

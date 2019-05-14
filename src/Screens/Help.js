@@ -13,6 +13,7 @@ import Header from '../Components/Header';
 import HelpModalAboutThisApp from '../Elements/Help/HelpModalAboutThisApp';
 import HelpModalAboutJpcanada from '../Elements/Help/HelpModalAboutJpcanada';
 import HelpModalAboutRegulation from '../Elements/Help/HelpModalAboutRegulation';
+import { isiPhoneSE } from '../lib/windowsize';
 
 const HelpLists = [
   { name: 'アプリについて', navigationLink: '' },
@@ -62,7 +63,9 @@ class Help extends React.Component {
           <Text style={styles.helpListText}>
             {value.name}
           </Text>
-          <Text style={styles.appVersion}>{expo.version}</Text>
+          <Text style={styles.appVersion}>
+            {expo.version}
+          </Text>
         </View>
       );
     });
@@ -134,7 +137,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   helpListText: {
-    fontSize: 15,
+    fontSize: isiPhoneSE() ? 12 : 15,
     color: '#707070',
     paddingLeft: '5%',
   },
@@ -145,7 +148,7 @@ const styles = StyleSheet.create({
   },
   appVersion: {
     position: 'absolute',
-    right: '50%',
+    right: '45%',
     fontSize: 15,
     color: '#707070',
   },

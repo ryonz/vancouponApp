@@ -175,7 +175,7 @@ const styles = StyleSheet.create({
     fontSize: isiPhoneSE() ? 20 : 25,
     fontWeight: '900',
     color: '#fff',
-    paddingLeft: '18%',
+    paddingLeft: isiPhoneSE() ? '16%' : '18%',
   },
   shopListQuestionTextBox: {
     width: '100%',

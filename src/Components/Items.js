@@ -451,7 +451,6 @@ const styles = StyleSheet.create({
   shopTagsBackground: {
     alignItems: 'center',
     backgroundColor: '#BCB8B8',
-    borderWidth: 0.1,
     borderRadius: 4,
     marginLeft: 7,
     overflow: 'hidden',
@@ -461,7 +460,6 @@ const styles = StyleSheet.create({
     color: '#fff',
     backgroundColor: '#BCB8B8',
     fontWeight: 'bold',
-    paddingTop: 0,
     margin: 3,
   },
   itemsDescription: {

@@ -80,11 +80,14 @@ const styles = StyleSheet.create({
     width: '68%',
     height: 120,
     alignItems: 'center',
+    overflow: 'hidden',
   },
   couponTextRightLine1: {
     fontSize: 17,
+    width: '90%',
     fontWeight: '500',
     marginTop: 53,
+    overflow: 'hidden',
   },
 });
 
